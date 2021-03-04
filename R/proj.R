@@ -251,7 +251,7 @@ projOrth <- function(vec, OrthSpace) {
 projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps) {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projOrth(projL1L2(vec, rds)$x, OrthSpace)$x
+    vecnew <- projOrth(projL1L2(vecold, rds)$x, OrthSpace)$x
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
@@ -262,7 +262,7 @@ projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
 projLGL2_then_projOrth <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projOrth(projLGL2(vec, rds, grp)$x, OrthSpace)$x
+    vecnew <- projOrth(projLGL2(vecold, rds, grp)$x, OrthSpace)$x
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
@@ -273,7 +273,7 @@ projLGL2_then_projOrth <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
 projOrth_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projL1L2(projOrth(vec, OrthSpace)$x, rds)$x
+    vecnew <- projL1L2(projOrth(vecold, OrthSpace)$x, rds)$x
       if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
@@ -284,7 +284,7 @@ projOrth_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
 projOrth_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projLGL2(projOrth(vec, OrthSpace)$x, rds, grp)$x
+    vecnew <- projLGL2(projOrth(vecold, OrthSpace)$x, rds, grp)$x
       if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
