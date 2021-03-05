@@ -44,7 +44,7 @@
 #' @author Derek Beaton
 #' @keywords multivariate
 
-sparse_geigen <- function(X, W, k = 0, R = 2L,
+sparseGEIGEN <- function(X, W, k = 0, R = 2L,
                           init = NULL, seed = NULL,
                           rds = rep(1, R),
                           grp = NULL,

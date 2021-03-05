@@ -73,7 +73,7 @@ sparseEIGEN <- function(X, R = 2L,
     }
 
     iter[r,] <- c(res.powit$iterTOTAL, res.powit$iterALS)
-    lambda[r] <- res.powit$d
+    lambda[r] <- res.powit$lambda
   }
 
   oD <- order(lambda, decreasing = TRUE)
@@ -122,7 +122,7 @@ initializeEIGEN <- function(X, I, R, init, seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
 
   if (init == "svd") {
-    svdx <- svd(X, nu=R, nv=R0)
+    svdx <- svd(X, nu=R, nv=R)
     U0 <- svdx$u
   } else if (init == "rand") {
     U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,R),
