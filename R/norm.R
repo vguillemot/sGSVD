@@ -15,6 +15,7 @@
 #' normL1(x) # = 1.6
 #' normL2(x) # ~= 1.12
 #' normLG(x, g) # ~= 1.5
+#' normalizeL2(x)
 NULL
 #' @rdname norm
 normL1 <- function(vec) {
@@ -27,6 +28,12 @@ normL2 <- function(vec) {
 #' @rdname norm
 normLG <- function(vec, grp) {
   return(sum(tapply(vec, grp, normL2)))
+}
+#' @rdname norm
+normalizeL2 <- function(vec) {
+  normu <- normL2(vec)
+  if (normu==0) return(vec)
+  return(u/normu)
 }
 
 
