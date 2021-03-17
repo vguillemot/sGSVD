@@ -29,11 +29,5 @@ normL2 <- function(vec) {
 normLG <- function(vec, grp) {
   return(sum(tapply(vec, grp, normL2)))
 }
-#' @rdname norm
-normalizeL2 <- function(vec) {
-  normu <- normL2(vec)
-  if (normu==0) return(vec)
-  return(u/normu)
-}
 
 
