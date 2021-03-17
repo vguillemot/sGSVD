@@ -88,19 +88,21 @@ sparseSVD <- function(X, Y = NULL, R = 2L,
     U[, r] <- res.als$u
     V[, r] <- res.als$v
 
+    if (!is.null(Y)) {
+      U.Rv[, r] <- projL2(Data %*% V[, r])$x
+      V.Ru[, r] <- projL2(t(Data) %*% U[, r])$x
+    }
+
     if (orthogonality == "loadings") {
       OrthSpaceLeft <- U
       OrthSpaceRight <- V
     }else if (orthogonality == "score") {
-      if (!is.null(Y))
+      if (is.null(Y))
         stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
-      U.Rv[,r] <- normalizeL2(Data %*% V[,r])
-      V.Ru[,r] <- normalizeL2(t(Data) %*% U[,r])
-
       OrthSpaceLeft <- U.Rv
       OrthSpaceRight <- V.Ru
     }else if (orthogonality == "both") {
-      if (!is.null(Y))
+      if (is.null(Y))
         stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
       ULx.bind <- cbind(U[,,drop=FALSE],u.Rv[,,drop=FALSE])
       VLy.bind <- cbind(V[,,drop=FALSE],v.Ru[,,drop=FALSE])
@@ -110,7 +112,7 @@ sparseSVD <- function(X, Y = NULL, R = 2L,
       OrthSpaceLeft <- ULx
       OrthSpaceRight <- VLy
     }else {
-      stop ("Wrong option for orthogonality. Please use eiter loadings (default), scroe, or both.")
+      stop ("Check what you entered for orthogonality. Please use eiter loadings (default), score, or both.")
     }
 
 
