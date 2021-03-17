@@ -16,7 +16,7 @@
 #' @author Vincent Guillemot
 #' @export
 sparseSVD <- function(X, R = 2L,
-                 init, initLeft = NULL, initRight = NULL, seed = NULL,
+                 init = "svd", initLeft = NULL, initRight = NULL, seed = NULL,
                  rdsLeft = rep(1, R), rdsRight = rep(1, R),
                  grpLeft = NULL, grpRight = NULL,
                  orthogonality = "loadings",
