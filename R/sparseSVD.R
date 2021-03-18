@@ -109,8 +109,8 @@ sparseSVD <- function(X, Y = NULL, R = 2L,
       ULx <- unique.column(ULx.bind, n.round = 10)
       VLy <- unique.column(VLy.bind, n.round = 10)
 
-      OrthSpaceLeft <- ULx
-      OrthSpaceRight <- VLy
+      OrthSpaceLeft <- qr.Q(qr(ULx))
+      OrthSpaceRight <- qr.Q(qr(VLy))
     }else {
       stop ("Check what you entered for orthogonality. Please use eiter loadings (default), score, or both.")
     }
