@@ -2,7 +2,7 @@
 #'
 #' @param X a (data) matrix;
 #' @param Y a second (data) matrix; this is optional and is only used for a two-table method
-#' @param R the desired rank of the singular decomposition;
+#' @param k the desired rank of the singular decomposition;
 #' @param au The radiuses (radii?) (>0) of the
 #' $L_1$ ball for each left vector
 #' @param av The radiuses (radii)?
@@ -16,9 +16,9 @@
 #' sparseSVD(X)
 #' @author Vincent Guillemot
 #' @export
-sparseSVD <- function(X, Y = NULL, R = 2L,
+sparseSVD <- function(X, Y = NULL, k = 2L,
                  init = "svd", initLeft = NULL, initRight = NULL, seed = NULL,
-                 rdsLeft = rep(1, R), rdsRight = rep(1, R),
+                 rdsLeft = rep(1, k), rdsRight = rep(1, k),
                  grpLeft = NULL, grpRight = NULL,
                  orthogonality = "loadings",
                  OrthSpaceLeft = NULL, OrthSpaceRight = NULL,
@@ -38,7 +38,7 @@ sparseSVD <- function(X, Y = NULL, R = 2L,
   }
 
   # Test that the arguments are valid
-  garb <- runTestsSVD(Data, R, init, initLeft, initRight, seed,
+  garb <- runTestsSVD(Data, k, init, initLeft, initRight, seed,
                    rdsLeft, rdsRight,
                    grpLeft, grpRight,
                    orthogonality, OrthSpaceLeft, OrthSpaceRight,
@@ -51,7 +51,7 @@ sparseSVD <- function(X, Y = NULL, R = 2L,
 
   # Build initialization matrices either with SVD (prefered method)
   # or randomly
-  res.init <- initializeSVD(Data, I, J, R, init, initLeft, initRight, seed)
+  res.init <- initializeSVD(Data, I, J, k, init, initLeft, initRight, seed)
   U0 <- res.init$U0
   V0 <- res.init$V0
   # Build projections based on the arguments
@@ -60,19 +60,19 @@ sparseSVD <- function(X, Y = NULL, R = 2L,
 
   if (is.null(OrthSpaceLeft)) OrthSpaceLeft <- matrix(0, I, 1)
   if (is.null(OrthSpaceRight)) OrthSpaceRight <- matrix(0, J, 1)
-  U <- matrix(0, I, R)
-  V <- matrix(0, J, R)
+  U <- matrix(0, I, k)
+  V <- matrix(0, J, k)
 
   if (!is.null(Y)) {
-    U.Rv <- matrix(0, I, R)
-    V.Ru <- matrix(0, J, R)
-    Lx <- Ly <- matrix(0, N, R)
+    U.Rv <- matrix(0, I, k)
+    V.Ru <- matrix(0, J, k)
+    Lx <- Ly <- matrix(0, N, k)
   }
 
-  iter <- matrix(NA, R, 2, dimnames = list(paste0("Dim. ", 1:R), c("Total", "ALS")))
-  d <- rep(NA, R)
+  iter <- matrix(NA, k, 2, dimnames = list(paste0("Dim. ", 1:k), c("Total", "ALS")))
+  d <- rep(NA, k)
 
-  for (r in 1:R) {
+  for (r in 1:k) {
     ## Power Iteration with orth projection
     res.als <- als(
       X = Data,                 # original matrix
@@ -139,7 +139,7 @@ makeComposedProjection <- function(projPriority, grp) {
   }
 }
 
-runTestsSVD <- function(X, R, init, initLeft, initRight,
+runTestsSVD <- function(X, k, init, initLeft, initRight,
                          rdsLeft, rdsRight,
                          grpLeft, grpRight,
                          projPriority,
@@ -156,8 +156,8 @@ runTestsSVD <- function(X, R, init, initLeft, initRight,
     stop("X should not contain missing values")
 
   ##### Test R ####
-  if (!is.integer(R)) stop("R should be an integer.")
-  if (R <= 1) stop("R should be > 1.")
+  if (!is.integer(k)) stop("R should be an integer.")
+  if (k <= 1) stop("K should be > 1.")
 
   ##### Test initialization ####
   if (is.null(init)) {
@@ -172,20 +172,20 @@ runTestsSVD <- function(X, R, init, initLeft, initRight,
   return(NULL)
 }
 
-initializeSVD <- function(X, I, J, R, init, initLeft, initRight, seed = NULL) {
+initializeSVD <- function(X, I, J, k, init, initLeft, initRight, seed = NULL) {
 
   if (!is.null(seed)) set.seed(seed)
 
   if (any(c(init, initLeft, initRight) == "svd")) {
-    svdx <- svd(X, nu=R, nv=R)
+    svdx <- svd(X, nu=k, nv=k)
   }
 
   if (is.null(init)) {
     if (initLeft == "svd") {
       U0 <- svdx$u
     } else if (initLeft == "rand") {
-      U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,R),
-                              Sigma = diag(R), empirical = TRUE)
+      U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+                              Sigma = diag(k), empirical = TRUE)
     } else {
       U0 <- initLeft
     }
@@ -193,8 +193,8 @@ initializeSVD <- function(X, I, J, R, init, initLeft, initRight, seed = NULL) {
     if (initRight == "svd") {
       V0 <- svdx$u
     } else if (initRight == "rand") {
-      V0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,R),
-                              Sigma = diag(R), empirical = TRUE)
+      V0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+                              Sigma = diag(k), empirical = TRUE)
     } else {
       V0 <- initRight
     }
@@ -202,10 +202,10 @@ initializeSVD <- function(X, I, J, R, init, initLeft, initRight, seed = NULL) {
     U0 <- svdx$u
     V0 <- svdx$v
   } else if ( init=="rand") {
-    U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,R),
-                            Sigma = diag(R), empirical = TRUE)
-    V0 <- 1/(J-1) * mvrnorm(n = J, mu = rep(0,R),
-                            Sigma = diag(R), empirical = TRUE)
+    U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+                            Sigma = diag(k), empirical = TRUE)
+    V0 <- 1/(J-1) * mvrnorm(n = J, mu = rep(0,k),
+                            Sigma = diag(k), empirical = TRUE)
   } else {
     stop("Unkown error, contact support!")
   }
