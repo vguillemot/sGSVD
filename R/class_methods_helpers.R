@@ -54,8 +54,8 @@ is_sGSVD <- function(x){
 #' @seealso \code{\link{inherits}}
 #'
 #' @export
-is_spls <- function(x){
-  inherits(x, "spls")
+is_sPLS <- function(x){
+  inherits(x, "sPLS")
 }
 
 #' is_GSVD_geigen

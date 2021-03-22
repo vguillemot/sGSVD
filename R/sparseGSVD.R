@@ -95,8 +95,8 @@
 #' @keywords multivariate
 
 
-sparseGSVD <- function(X, LW, RW, k = 0, tol = .Machine$double.eps,
-                       init, initLeft = NULL, initRight = NULL, seed = NULL,
+sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
+                       init = "svd", initLeft = NULL, initRight = NULL, seed = NULL,
                        rdsLeft = rep(1, k), rdsRight = rep(1, k),
                        grpLeft = NULL, grpRight = NULL,
                        orthogonality = "loadings",
@@ -259,7 +259,7 @@ sparseGSVD <- function(X, LW, RW, k = 0, tol = .Machine$double.eps,
   }
 
   # res <- tolerance_svd(X, nu = k, nv = k, tol = tol)
-  res <- sparseSVD(X = X, k = k,
+  res <- sparseSVD(X = X, Y = Y, k = k,
             init=init, initLeft = initLeft, initRight = initRight, seed = seed,
             rdsLeft = rdsLeft, rdsRight = rdsRight,
             grpLeft = grpLeft, grpRight = grpRight,
@@ -334,7 +334,7 @@ sparseGSVD <- function(X, LW, RW, k = 0, tol = .Machine$double.eps,
   rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- rownames(X)
   rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(X)
 
-  class(res) <- c("sgsvd", "sGSVD", "list")
+  class(res) <- c("sGSVD", "sSVD", "list")
   return(res)
 
 }
