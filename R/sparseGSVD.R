@@ -334,7 +334,7 @@ sparseGSVD <- function(X, LW, RW, k = 0, tol = .Machine$double.eps,
   rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- rownames(X)
   rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(X)
 
-  class(res) <- c("gsvd", "GSVD", "list")
+  class(res) <- c("sgsvd", "sGSVD", "list")
   return(res)
 
 }
