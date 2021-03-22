@@ -259,7 +259,7 @@ sparseGSVD <- function(X, LW, RW, k = 0, tol = .Machine$double.eps,
   }
 
   # res <- tolerance_svd(X, nu = k, nv = k, tol = tol)
-  res <- sparseSVD(X = X, R = k,
+  res <- sparseSVD(X = X, k = k,
             init=init, initLeft = initLeft, initRight = initRight, seed = seed,
             rdsLeft = rdsLeft, rdsRight = rdsRight,
             grpLeft = grpLeft, grpRight = grpRight,
