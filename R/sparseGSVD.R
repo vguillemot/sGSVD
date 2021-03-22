@@ -280,8 +280,6 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
   res$U <- res$U[,1:components.to.return, drop = FALSE]
   res$V <- res$V[,1:components.to.return, drop = FALSE]
 
-
-
   # make scores according to weights
   if(!LW_is_missing){
     if(LW_is_vector){
@@ -330,9 +328,13 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
 
   }
 
-
-  rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- rownames(X)
-  rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(X)
+ if (is.null(Y)){
+   rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- rownames(X)
+   rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(X)
+ }else{
+   rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- colnames(X)
+   rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(Y)
+ }
 
   class(res) <- c("sGSVD", "sSVD", "list")
   return(res)
