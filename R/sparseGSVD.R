@@ -113,8 +113,14 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
   if (length(X_dimensions) > 2 || !(is.numeric(X) || is.complex(X))){
     stop("gsvd: 'X' must be a numeric or complex matrix")
   }
-  if (!is.matrix(X)){
+  if ( !is.matrix(X) ){
     X <- as.matrix(X)
+  }
+  Y_is_missing <- missing(Y)
+  if( !Y_is_missing ){
+    if ( !is.matrix(Y) ){
+      Y <- as.matrix(Y)
+    }
   }
 
 
