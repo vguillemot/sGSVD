@@ -104,8 +104,8 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
     }else if (orthogonality == "both") {
       if (is.null(Y))
         stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
-      ULx.bind <- cbind(U[,,drop=FALSE],u.Rv[,,drop=FALSE])
-      VLy.bind <- cbind(V[,,drop=FALSE],v.Ru[,,drop=FALSE])
+      ULx.bind <- cbind(U[,,drop=FALSE],U.Rv[,,drop=FALSE])
+      VLy.bind <- cbind(V[,,drop=FALSE],V.Ru[,,drop=FALSE])
       ULx <- unique.column(ULx.bind, n.round = 10)
       VLy <- unique.column(VLy.bind, n.round = 10)
 
