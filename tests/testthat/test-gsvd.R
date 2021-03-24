@@ -29,12 +29,13 @@ RW <- 1/Rv
 gsvd.words.res <- gsvd(as.matrix(X.ca.proc), LW = diag(LW), RW = diag(RW))
 sgsvd.words.res <- sparseGSVD(as.matrix(X.ca.proc), LW = diag(LW), RW = diag(RW), k = 2L, init = "svd", rdsLeft = rep(sqrt(nrow(X.ca)), 2), rdsRight = rep(sqrt(ncol(X.ca)), 2))
 
+tol  = 1e-15
 test_that("sparseGSVD gives back plain GSVD", {
-  expect_equal(round(sgsvd.words.res$p,10), round(ca.authors.res$ExPosition.Data$M * ca.authors.res$ExPosition.Data$pdq$p,10))
-  expect_equal(round(sgsvd.words.res$p,10), round(gsvd.words.res$p,10))
-  expect_equal(round(sgsvd.words.res$q,10), round(ca.authors.res$ExPosition.Data$pdq$q,10))
-  expect_equal(round(sgsvd.words.res$d,10), round(ca.authors.res$ExPosition.Data$pdq$Dv,10))
-  expect_equal(round(sgsvd.words.res$fi,10), round(ca.authors.res$ExPosition.Data$fi,10))
-  expect_equal(round(sgsvd.words.res$fj,10), round(ca.authors.res$ExPosition.Data$fj,10))
+  expect_equal(sgsvd.words.res$p, ca.authors.res$ExPosition.Data$M * ca.authors.res$ExPosition.Data$pdq$p, tolerance = tol)
+  expect_equal(sgsvd.words.res$p, gsvd.words.res$p, tolerance = tol)
+  expect_equal(sgsvd.words.res$q, ca.authors.res$ExPosition.Data$pdq$q, tolerance = tol)
+  expect_equal(sgsvd.words.res$d, ca.authors.res$ExPosition.Data$pdq$Dv, tolerance = tol)
+  expect_equal(sgsvd.words.res$fi, ca.authors.res$ExPosition.Data$fi, tolerance = tol)
+  expect_equal(sgsvd.words.res$fj, ca.authors.res$ExPosition.Data$fj, tolerance = tol)
 })
 
