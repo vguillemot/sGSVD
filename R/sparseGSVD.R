@@ -107,8 +107,6 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
                        itermaxALS = 1000, itermaxPOCS = 1000,
                        epsALS = 1e-10, epsPOCS = 1e-10){
 
-  # preliminaries
-  X_dimensions <- dim(X)
   ## stolen from MASS::ginv()
   if (length(X_dimensions) > 2 || !(is.numeric(X) || is.complex(X))){
     stop("gsvd: 'X' must be a numeric or complex matrix")
@@ -123,19 +121,27 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
     }
   }
 
+  # preliminaries
+  X_dimensions <- dim(X)
+  if ( !Y_is_missing ) Y_dimensions <- dim(Y)
 
   # a few things about LW for stopping conditions
   LW_is_missing <- missing(LW)
-  if(!LW_is_missing){
+
+  if ( !LW_is_missing ){
 
     LW_is_vector <- is.vector(LW)
 
-    if(!LW_is_vector){
-
-      if( nrow(LW) != ncol(LW) | nrow(LW) != X_dimensions[1] ){
-        stop("gsvd: nrow(LW) does not equal ncol(LW) or nrow(X)")
+    if ( !LW_is_vector ){
+      if ( Y_is_missing ){
+        if ( nrow(LW) != ncol(LW) | nrow(LW) != X_dimensions[1] ){
+          stop("gsvd: nrow(LW) does not equal ncol(LW) or nrow(X)")
+        }
+      }else{
+        if ( nrow(LW) != ncol(LW) | nrow(LW) != X_dimensions[2] ){
+          stop("gsvd: nrow(LW) does not equal ncol(LW) or ncol(X)")
+        }
       }
-
       # if you gave me all zeros, I'm stopping.
       if(is_empty_matrix(LW)){
         stop("gsvd: LW is empty (i.e., all 0s")
@@ -157,16 +163,20 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
 
   # a few things about RW for stopping conditions
   RW_is_missing <- missing(RW)
-  if(!RW_is_missing){
+  if ( !RW_is_missing ){
 
     RW_is_vector <- is.vector(RW)
 
-    if(!RW_is_vector){
-
-      if( nrow(RW) != ncol(RW) | nrow(RW) != X_dimensions[2] ){
-        stop("gsvd: nrow(RW) does not equal ncol(RW) or ncol(X)")
+    if ( !RW_is_vector ){
+      if ( Y_is_missing ){
+        if( nrow(RW) != ncol(RW) | nrow(RW) != X_dimensions[2] ){
+          stop("gsvd: nrow(RW) does not equal ncol(RW) or ncol(X)")
+        }
+      }else{
+        if( nrow(RW) != ncol(RW) | nrow(RW) != Y_dimensions[2] ){
+          stop("gsvd: nrow(RW) does not equal ncol(RW) or ncol(Y)")
+        }
       }
-
       # if you gave me all zeros, I'm stopping.
       if(is_empty_matrix(RW)){
         stop("gsvd: RW is empty (i.e., all 0s")
