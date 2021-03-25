@@ -2,7 +2,7 @@ library(ExPosition)
 library(GSVD)
 library(GPLS)
 
-tol  = 1e-13
+tol  = 1e-14
 
 # test SVD ==================================
 data(words)
@@ -59,6 +59,8 @@ test_that("sparsePLSC gives back plain PLSC (orthogonality = score)", {
   expect_equal(abs(spls.res.score$fi), abs(plscor_results$fi), tolerance = tol)
   expect_equal(abs(spls.res.score$fj), abs(plscor_results$fj), tolerance = tol)
 })
+
+sparseSVD(X4svd, Y4svd, orthogonality = "both", rdsLeft = rep(sqrt(ncol(wine$objective)), 2), rdsRight = rep(sqrt(ncol(wine$subjective)), 2))
 
 
 # test GSVD ================================
