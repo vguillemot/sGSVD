@@ -151,9 +151,16 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
     }
 
     if(LW_is_vector){
-      if(length(LW)!=X_dimensions[1]){
-        stop("gsvd: length(LW) does not equal nrow(X)")
+      if ( Y_is_missing ){
+        if(length(LW)!=X_dimensions[1]){
+          stop("gsvd: length(LW) does not equal nrow(X)")
+        }
+      }else{
+        if(length(LW)!=X_dimensions[2]){
+          stop("gsvd: length(LW) does not equal ncol(X)")
+        }
       }
+
 
       # if you gave me all zeros, I'm stopping.
       # if(all(abs(LW)<=tol)){
@@ -186,8 +193,14 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
     }
 
     if(RW_is_vector){
-      if(length(RW)!=X_dimensions[2]){
-        stop("gsvd: length(RW) does not equal ncol(X)")
+      if ( Y_is_missing ){
+        if(length(RW)!=X_dimensions[2]){
+          stop("gsvd: length(RW) does not equal ncol(X)")
+        }
+      }else{
+        if(length(RW)!=Y_dimensions[2]){
+          stop("gsvd: length(RW) does not equal ncol(Y)")
+        }
       }
 
       # if you gave me all zeros, I'm stopping.
@@ -278,16 +291,16 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
 
   # res <- tolerance_svd(X, nu = k, nv = k, tol = tol)
   res <- sparseSVD(X = X, Y = Y, k = k,
-            init=init, initLeft = initLeft, initRight = initRight, seed = seed,
-            rdsLeft = rdsLeft, rdsRight = rdsRight,
-            grpLeft = grpLeft, grpRight = grpRight,
-            orthogonality = orthogonality,
-            OrthSpaceLeft = OrthSpaceLeft, OrthSpaceRight = OrthSpaceRight,
-            projPriority = projPriority,
-            projPriorityLeft = projPriorityLeft,
-            projPriorityRight = projPriorityRight,
-            itermaxALS = itermaxALS, itermaxPOCS = itermaxPOCS,
-            epsALS = epsALS, epsPOCS = epsPOCS)
+                   init=init, initLeft = initLeft, initRight = initRight, seed = seed,
+                   rdsLeft = rdsLeft, rdsRight = rdsRight,
+                   grpLeft = grpLeft, grpRight = grpRight,
+                   orthogonality = orthogonality,
+                   OrthSpaceLeft = OrthSpaceLeft, OrthSpaceRight = OrthSpaceRight,
+                   projPriority = projPriority,
+                   projPriorityLeft = projPriorityLeft,
+                   projPriorityRight = projPriorityRight,
+                   itermaxALS = itermaxALS, itermaxPOCS = itermaxPOCS,
+                   epsALS = epsALS, epsPOCS = epsPOCS)
 
   res$d_full <- res$d
   res$l_full <- res$d_full^2
@@ -346,13 +359,13 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
 
   }
 
- if (is.null(Y)){
-   rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- rownames(X)
-   rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(X)
- }else{
-   rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- colnames(X)
-   rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(Y)
- }
+  if (is.null(Y)){
+    rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- rownames(X)
+    rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(X)
+  }else{
+    rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- colnames(X)
+    rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(Y)
+  }
 
   class(res) <- c("sGSVD", "sSVD", "list")
   return(res)
