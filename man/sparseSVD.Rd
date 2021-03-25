@@ -6,13 +6,14 @@
 \usage{
 sparseSVD(
   X,
-  R = 2L,
-  init,
+  Y = NULL,
+  k = 2L,
+  init = "svd",
   initLeft = NULL,
   initRight = NULL,
   seed = NULL,
-  rdsLeft = rep(1, R),
-  rdsRight = rep(1, R),
+  rdsLeft = rep(1, k),
+  rdsRight = rep(1, k),
   grpLeft = NULL,
   grpRight = NULL,
   orthogonality = "loadings",
@@ -30,7 +31,9 @@ sparseSVD(
 \arguments{
 \item{X}{a (data) matrix;}
 
-\item{R}{the desired rank of the singular decomposition;}
+\item{Y}{a second (data) matrix; this is optional and is only used for a two-table method}
+
+\item{k}{the desired rank of the singular decomposition;}
 
 \item{init}{How to initialize the algorithm}
 

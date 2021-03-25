@@ -276,10 +276,19 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
     if( RW_is_vector ){
       sqrt_RW <- sqrt(RW)
       # X <- sweep(X,2, sqrt_RW,"*") ## replace the sweep with * & t()
-      X <- t(t(X) * sqrt_RW)
+      if (Y_is_missing){
+        X <- t(t(X) * sqrt_RW)
+      }else{
+        Y <- Y * sqrt_RW
+      }
     }else{
       RW <- as.matrix(RW)
-      X <- X %*% sqrt_psd_matrix(RW)
+      if (Y_is_missing){
+        X <- X %*% sqrt_psd_matrix(RW)
+      }else{
+        Y <- sqrt_psd_matrix(RW) %*% Y
+      }
+
     }
 
   }
