@@ -94,13 +94,13 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
     }
 
     if (orthogonality == "loadings") {
-      OrthSpaceLeft <- U
-      OrthSpaceRight <- V
+      OrthSpaceLeft <- U[,(1:r),drop=FALSE]
+      OrthSpaceRight <- V[,(1:r),drop=FALSE]
     }else if (orthogonality == "score") {
       if (is.null(Y))
         stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
-      OrthSpaceLeft <- U.Rv
-      OrthSpaceRight <- V.Ru
+      OrthSpaceLeft <- U.Rv[,(1:r),drop=FALSE]
+      OrthSpaceRight <- V.Ru[,(1:r),drop=FALSE]
     }else if (orthogonality == "both") {
       if (is.null(Y))
         stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
