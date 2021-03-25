@@ -60,13 +60,13 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
 
   if (is.null(OrthSpaceLeft)) OrthSpaceLeft <- matrix(0, I, 1)
   if (is.null(OrthSpaceRight)) OrthSpaceRight <- matrix(0, J, 1)
-  U <- matrix(0, I, k)
-  V <- matrix(0, J, k)
+  U <- matrix(NA, I, k)
+  V <- matrix(NA, J, k)
 
   if (!is.null(Y)) {
-    U.Rv <- matrix(0, I, k)
-    V.Ru <- matrix(0, J, k)
-    Lx <- Ly <- matrix(0, N, k)
+    U.Rv <- matrix(NA, I, k)
+    V.Ru <- matrix(NA, J, k)
+    Lx <- Ly <- matrix(NA, N, k)
   }
 
   iter <- matrix(NA, k, 2, dimnames = list(paste0("Dim. ", 1:k), c("Total", "ALS")))
@@ -104,8 +104,8 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
     }else if (orthogonality == "both") {
       if (is.null(Y))
         stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
-      ULx.bind <- cbind(U[,,drop=FALSE],U.Rv[,,drop=FALSE])
-      VLy.bind <- cbind(V[,,drop=FALSE],V.Ru[,,drop=FALSE])
+      ULx.bind <- cbind(U[,(1:r),drop=FALSE],U.Rv[,(1:r),drop=FALSE])
+      VLy.bind <- cbind(V[,(1:r),drop=FALSE],V.Ru[,(1:r),drop=FALSE])
       ULx <- unique.column(ULx.bind, n.round = 10)
       VLy <- unique.column(VLy.bind, n.round = 10)
 
