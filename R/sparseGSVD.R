@@ -107,6 +107,17 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
                        itermaxALS = 1000, itermaxPOCS = 1000,
                        epsALS = 1e-10, epsPOCS = 1e-10){
 
+  # preliminaries
+  Y_is_missing <- missing(Y)
+  if( !Y_is_missing ){
+    if ( !is.matrix(Y) ){
+      Y <- as.matrix(Y)
+    }
+  }
+  if ( !Y_is_missing ) Y_dimensions <- dim(Y)
+
+  X_dimensions <- dim(X)
+
   ## stolen from MASS::ginv()
   if (length(X_dimensions) > 2 || !(is.numeric(X) || is.complex(X))){
     stop("gsvd: 'X' must be a numeric or complex matrix")
@@ -114,16 +125,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
   if ( !is.matrix(X) ){
     X <- as.matrix(X)
   }
-  Y_is_missing <- missing(Y)
-  if( !Y_is_missing ){
-    if ( !is.matrix(Y) ){
-      Y <- as.matrix(Y)
-    }
-  }
 
-  # preliminaries
-  X_dimensions <- dim(X)
-  if ( !Y_is_missing ) Y_dimensions <- dim(Y)
 
   # a few things about LW for stopping conditions
   LW_is_missing <- missing(LW)
