@@ -1,98 +1,43 @@
-#' (group) Sparse GSVD
-#'
-#' @description The generalized singular value decomposition (GSVD) generalizes the standard SVD (see \code{\link{svd}}) procedure through addition of (optional) constraints applied to the rows and/or columns of a matrix.
-#' @details A package specifically designed for the generalized eigen decomposition, generalized singular value decomposition, and generalized partial least squares-singular value decomposition.
-#' Each decomposition allows for the use of weights (or constraints) applied to the columns and/or rows of each data matrix.
-#' This package provides these decompositions as the core for a very large list of standard statistical---and typically multivariate---approaches, including but not limited to principal components analysis, metric multidimensional scaling, standard and multiple correspondence analysis, partial least squares, canonical correlation analysis, and multivariate linear regression/reduced rank regression/redundancy analysis.
-#' @seealso \code{\link{gsvd}}, \code{\link{geigen}}, \code{\link{gplssvd}}
-#'
-#' @references
-#'   Abdi, H. (2007). Singular Value Decomposition (SVD) and Generalized Singular Value Decomposition (GSVD). In N.J. Salkind (Ed.): \emph{Encyclopedia of Measurement and Statistics}.Thousand Oaks (CA): Sage. pp. 907-912.\cr
-#'   Beaton, D., Fatt, C. R. C., & Abdi, H. (2014). An ExPosition of multivariate analysis with the singular value decomposition in R. \emph{Computational Statistics & Data Analysis}, 72, 176-189. \cr
-#'   Cherry, S. (1996). Singular Value Decomposition Analysis and Canonical Correlation Analysis. Journal of Climate, 9(9), 2003–2009. Retrieved from JSTOR. \cr
-#'   Gower, J. C., Gardner-Lubbe, S., & Le Roux, N. J. DATA ANALYSIS: GOOD BUT…. Statistica Applicata - Italian Journal of Applied Statistics, 29. \cr
-#'   Greenacre, M. (1984). Theory and applications of correspondence analysis. \emph{Academic Press.}\cr
-#'   Holmes, S. (2008). Multivariate data analysis: the French way. \emph{In Probability and statistics: Essays in honor of David A. Freedman (pp. 219-233)}. Institute of Mathematical Statistics. \cr
-#'   Holmes, S., & Josse, J. (2017). Discussion of “50 Years of Data Science”. \emph{Journal of Computational and Graphical Statistics}, 26(4), 768-769. \cr
-#'   Husson, F., Josse, J., & Saporta, G. (2016). Jan de Leeuw and the French school of data analysis. \emph{Journal of Statistical Software}, 73(6), 1-17. \cr
-#'   Jolliffe, I. T., & Cadima, J. (2016). Principal component analysis: A review and recent developments. Philosophical Transactions. Series A, Mathematical, Physical, and Engineering Sciences, 374(2065).\cr
-#'   Lebart  L.,  Morineau  A., & Warwick  K.  (1984). Multivariate  Descriptive  Statistical  Analysis. \emph{J. Wiley}, New York. \cr
-#'   Nguyen, L. H., & Holmes, S. (2019). Ten quick tips for effective dimensionality reduction. PLOS Computational Biology, 15(6), e1006907. https://doi.org/10.1371/journal.pcbi.1006907 \cr
-#'   Yanai, H., Takeuchi, K., & Takane, Y. (2011). Projection Matrices, Generalized Inverse Matrices, and Singular Value Decomposition. \emph{Springer-Verlag, New-York.}\cr
-#'
-#' @keywords internal
-#'
-"_PACKAGE"
-
-#' @export
-#'
-#' @title Generalized singular value decomposition
-#'
-#' @description
-#' \code{gsvd} takes in left (\code{LW}) and right (\code{RW}) constraints (usually diagonal matrices, but any positive semi-definite matrix is fine) that are applied to the data (\code{X}).
-#'   Left and right constraints are used for the orthogonality conditions.
-#'
-#' @param X a data matrix to decompose
-#' @param LW \bold{L}eft \bold{W}eights -- the constraints applied to the left side (rows) of the matrix and thus left singular vectors.
-#' @param RW \bold{R}ight \bold{W}eights -- the constraints applied to the right side (columns) of the matrix and thus right singular vectors.
-#' @param k total number of components to return though the full variance will still be returned (see \code{d_full}). If 0, the full set of components are returned.
-#' @param tol default is .Machine$double.eps. A tolerance level for eliminating effectively zero (small variance), negative, imaginary eigen/singular value components.
-#'
-#' @return A list with eleven elements:
-#' \item{d_full}{A vector containing the singular values of X above the tolerance threshold (based on eigenvalues).}
-#' \item{l_full}{A vector containing the eigen values of X above the tolerance threshold (\code{tol}).}
-#' \item{d}{A vector of length \code{min(length(d_full), k)} containing the retained singular values of X}
-#' \item{l}{A vector of length \code{min(length(l_full), k)} containing the retained eigen values of X}
-#' \item{u}{Left (rows) singular vectors. Dimensions are \code{nrow(X)} by k.}
-#' \item{p}{Left (rows) generalized singular vectors. Dimensions are \code{nrow(X)} by k.}
-#' \item{fi}{Left (rows) component scores. Dimensions are \code{nrow(X)} by k.}
-#' \item{v}{Right (columns) singular vectors. Dimensions are \code{ncol(X)} by k.}
-#' \item{q}{Right (columns) generalized singular vectors. Dimensions are \code{ncol(X)} by k.}
-#' \item{fj}{Right (columns) component scores. Dimensions are \code{ncol(X)} by k.}
-#'
-#' @seealso \code{\link{tolerance_svd}}, \code{\link{geigen}} and \code{\link{gplssvd}}
-#'
+#' @title Sparse Generalized Singular Value Decomposition
+#' @description Constrained SVD of a matrix (wrapper of c++ functions).
+#' @param X a (data) matrix;
+#' @param Y a second (data) matrix; this is optional and is only used for a two-table method, Default: NULL
+#' @param LW PARAM_DESCRIPTION
+#' @param RW PARAM_DESCRIPTION
+#' @param k the desired rank of the singular decomposition, Default: 0
+#' @param tol PARAM_DESCRIPTION, Default: .Machine$double.eps
+#' @param init How to initialize the algorithm, Default: 'svd'
+#' @param initLeft PARAM_DESCRIPTION, Default: NULL
+#' @param initRight PARAM_DESCRIPTION, Default: NULL
+#' @param seed PARAM_DESCRIPTION, Default: NULL
+#' @param rdsLeft The radius (>0) of the
+#' $L_1$ ball for each left vector, Default: rep(1, k)
+#' @param rdsRight The radius (>0) of the $L_1$ balls for each right vector, Default: rep(1, k)
+#' @param grpLeft PARAM_DESCRIPTION, Default: NULL
+#' @param grpRight PARAM_DESCRIPTION, Default: NULL
+#' @param orthogonality PARAM_DESCRIPTION, Default: 'loadings'
+#' @param OrthSpaceLeft PARAM_DESCRIPTION, Default: NULL
+#' @param OrthSpaceRight PARAM_DESCRIPTION, Default: NULL
+#' @param projPriority PARAM_DESCRIPTION, Default: 'orth'
+#' @param projPriorityLeft PARAM_DESCRIPTION, Default: projPriority
+#' @param projPriorityRight PARAM_DESCRIPTION, Default: projPriority
+#' @param itermaxALS The maximum number of ALS iterations, Default: 1000
+#' @param itermaxPOCS The maximum number of the POCs iterations, Default: 1000
+#' @param epsALS Precision in ALS, Default: 1e-10
+#' @param epsPOCS Precision in POCs, Default: 1e-10
+#' @return Pseudo-singular vectors and values
+#' @details DETAILS
 #' @examples
-#'
-#'  data(wine, package="GSVD")
-#'  wine.objective <- wine$objective
-#'  ## Principal components analysis: "covariance"
-#'  ## "covariance" PCA
-#'  cov.pca.data <- scale(wine.objective,scale=FALSE)
-#'  cov.pca.res <- gsvd(cov.pca.data)
-#'
-#'  ## Principal components analysis: "correlation"
-#'  cor.pca.data <- scale(wine.objective,scale=TRUE)
-#'  cor.pca.res <- gsvd(cor.pca.data)
-#'
-#'  ## Principal components analysis: "correlation" with the covariance matrix and constraints
-#'  cor.pca.res2 <- gsvd(cov.pca.data,RW=1/apply(wine.objective,2,var))
-#'
-#'
-#'  ## Correspondence analysis
-#'  data(authors, package="GSVD")
-#'  Observed <- authors/sum(authors)
-#'  row.w <- rowSums(Observed)
-#'  col.w <- colSums(Observed)
-#'  Expected <- row.w %o% col.w
-#'  Deviations <- Observed - Expected
-#'  ca.res <- gsvd(Deviations,1/row.w,1/col.w)
-#'
-#'
-#'  ## Multiple correspondence analysis
-#'  data("snps.druguse", package="GSVD")
-#'  X <- model.matrix(~ .,
-#'      data=snps.druguse$DATA1,
-#'      contrasts.arg = lapply(snps.druguse$DATA1, contrasts, contrasts=FALSE))[,-1]
-#'  Observed <- X/sum(X)
-#'  row.w <- rowSums(Observed)
-#'  col.w <- colSums(Observed)
-#'  Expected <- row.w %o% col.w
-#'  Deviations <- Observed - Expected
-#'  ca.res <- gsvd(Deviations,1/row.w,1/col.w)
-#'
-#' @author Derek Beaton
-#' @keywords multivariate
+#' X <- matrix(rnorm(20), 5, 4)
+#' sparseSVD(X)
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname sparseGSVD
+#' @author Vincent Guillemot, Ju-Chi Yu
+#' @export
 
 
 sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
