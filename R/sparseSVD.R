@@ -1,20 +1,42 @@
-#' Constrained SVD of a matrix (wrapper of c++ functions).
-#'
+#' @title FUNCTION_TITLE
+#' @description Constrained SVD of a matrix (wrapper of c++ functions).
 #' @param X a (data) matrix;
-#' @param Y a second (data) matrix; this is optional and is only used for a two-table method
-#' @param k the desired rank of the singular decomposition;
-#' @param au The radiuses (radii?) (>0) of the
-#' $L_1$ ball for each left vector
-#' @param av The radiuses (radii)?
-#' (>0) of the $L_1$ balls for each right vector
-#' @param itermax The maximum number of iterations
-#' @param eps Precision
-#' @param init How to initialize the algorithm
+#' @param Y a second (data) matrix; this is optional and is only used for a two-table method, Default: NULL
+#' @param LW PARAM_DESCRIPTION
+#' @param RW PARAM_DESCRIPTION
+#' @param k the desired rank of the singular decomposition, Default: 0
+#' @param tol PARAM_DESCRIPTION, Default: .Machine$double.eps
+#' @param init How to initialize the algorithm, Default: 'svd'
+#' @param initLeft PARAM_DESCRIPTION, Default: NULL
+#' @param initRight PARAM_DESCRIPTION, Default: NULL
+#' @param seed PARAM_DESCRIPTION, Default: NULL
+#' @param rdsLeft The radius (>0) of the
+#' $L_1$ ball for each left vector, Default: rep(1, k)
+#' @param rdsRight The radius (>0) of the $L_1$ balls for each right vector, Default: rep(1, k)
+#' @param grpLeft PARAM_DESCRIPTION, Default: NULL
+#' @param grpRight PARAM_DESCRIPTION, Default: NULL
+#' @param orthogonality PARAM_DESCRIPTION, Default: 'loadings'
+#' @param OrthSpaceLeft PARAM_DESCRIPTION, Default: NULL
+#' @param OrthSpaceRight PARAM_DESCRIPTION, Default: NULL
+#' @param projPriority PARAM_DESCRIPTION, Default: 'orth'
+#' @param projPriorityLeft PARAM_DESCRIPTION, Default: projPriority
+#' @param projPriorityRight PARAM_DESCRIPTION, Default: projPriority
+#' @param itermaxALS The maximum number of ALS iterations, Default: 1000
+#' @param itermaxPOCS The maximum number of the POCs iterations, Default: 1000
+#' @param epsALS Precision in ALS, Default: 1e-10
+#' @param epsPOCS Precision in POCs, Default: 1e-10
 #' @return Pseudo-singular vectors and values
+#' @details DETAILS
 #' @examples
 #' X <- matrix(rnorm(20), 5, 4)
 #' sparseSVD(X)
-#' @author Vincent Guillemot
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname sparseGSVD
+#' @author Vincent Guillemot, Ju-Chi Yu
 #' @export
 sparseSVD <- function(X, Y = NULL, k = 2L,
                  init = "svd", initLeft = NULL, initRight = NULL, seed = NULL,

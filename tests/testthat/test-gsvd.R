@@ -9,7 +9,7 @@ data(words)
 pca.words.res <- epPCA(words$data, graphs = FALSE)
 
 X <- scale(as.matrix(words$data))
-sgsvd.words.res <- sparseGSVD(X, init = "svd", rdsLeft = rep(sqrt(nrow(words$data)), 2), rdsRight = rep(sqrt(ncol(words$data)), 2))
+sgsvd.words.res <- sparseGSVD(X, init = "svd", k = 2L, rdsLeft = rep(sqrt(nrow(words$data)), 2), rdsRight = rep(sqrt(ncol(words$data)), 2))
 
 test_that("sparseGSVD gives back plain SVD", {
   expect_equal(sgsvd.words.res$U, pca.words.res$ExPosition.Data$pdq$p)

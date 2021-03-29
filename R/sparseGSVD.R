@@ -257,40 +257,43 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, k = 0, tol = .Machine$double.eps,
 
 
   # this manipulates X as needed based on XLW
-  if ( !LW_is_missing ) {
-
+  if ( !LW_is_missing ) { ## plain SVD
     if ( LW_is_vector ) {
       sqrt_LW <- sqrt(LW)
       # X <- sweep(X,1,sqrt_LW,"*") ## replace the sweep with * & t()
-      X <- X * sqrt_LW
-    } else {
+      if (Y_is_missing) {   ## one-table
+        X <- X * sqrt_LW
+      } else {              ## two-table
+        X <- sqrt_LW * X
+      }
+    } else {              ## GSVD
       LW <- as.matrix(LW)
       # X <- (LW %^% (1/2)) %*% X
-      X <- sqrt_psd_matrix(LW) %*% X
+      if (Y_is_missing) {   ## one-table
+        X <- sqrt_psd_matrix(LW) %*% X
+      } else {              ## two-table
+      X <- X %*% sqrt_psd_matrix(LW)
     }
-
+    }
   }
-  # this manipulates X as needed based on XRW
-  if ( !RW_is_missing ) {
-
-    if( RW_is_vector ){
+  # this manipulates X (or Y) as needed based on XRW
+  if ( !RW_is_missing ) { ## plain SVD
+    if( RW_is_vector ) {
       sqrt_RW <- sqrt(RW)
       # X <- sweep(X,2, sqrt_RW,"*") ## replace the sweep with * & t()
-      if (Y_is_missing){
+      if (Y_is_missing) {   ## one-table
         X <- t(t(X) * sqrt_RW)
-      }else{
+      } else {              ## two-table
         Y <- Y * sqrt_RW
       }
-    }else{
+    } else {              ## GSVD
       RW <- as.matrix(RW)
-      if (Y_is_missing){
+      if (Y_is_missing) {   ## one-table
         X <- X %*% sqrt_psd_matrix(RW)
-      }else{
+      } else {              ## two-table
         Y <- sqrt_psd_matrix(RW) %*% Y
       }
-
     }
-
   }
 
   # all the decomposition things
