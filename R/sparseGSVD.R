@@ -438,6 +438,12 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
     rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- colnames(X)
     rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(Y)
   }
+  # Compute the Sparse Index
+  res$rdsLeft <- rdsLeft
+  res$rdsRight <- rdsRight
+  res.SI <- sparseIndex(X = X, res.gsvd = res, tol = tol.si)
+  res$SI <- res.SI
+
 
   class(res) <- c("sGSVD", "sSVD", "list")
   return(res)
