@@ -356,10 +356,15 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
     }
   }
 
+  if ( !is.integer(k) ){
+    k <- as.integer(k) # round down to an integer
+  }
+
   # all the decomposition things
   if (k <= 0) {
     k <- min(X_dimensions)
   }
+
 
   # res <- tolerance_svd(X, nu = k, nv = k, tol = tol)
   res <- sparseSVD(X = X, Y = Y, k = k,
