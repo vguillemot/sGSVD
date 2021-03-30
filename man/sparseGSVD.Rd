@@ -2,13 +2,15 @@
 % Please edit documentation in R/sparseGSVD.R
 \name{sparseGSVD}
 \alias{sparseGSVD}
-\title{Generalized singular value decomposition}
+\title{Sparse Generalized Singular Value Decomposition}
 \usage{
 sparseGSVD(
   X,
   Y = NULL,
   LW,
   RW,
+  LM,
+  RM,
   k = 0,
   tol = .Machine$double.eps,
   init = "svd",
@@ -32,77 +34,73 @@ sparseGSVD(
 )
 }
 \arguments{
-\item{X}{a data matrix to decompose}
+\item{X}{a (data) matrix;}
 
-\item{LW}{\bold{L}eft \bold{W}eights -- the constraints applied to the left side (rows) of the matrix and thus left singular vectors.}
+\item{Y}{a second (data) matrix; this is optional and is only used for a two-table method, Default: NULL}
 
-\item{RW}{\bold{R}ight \bold{W}eights -- the constraints applied to the right side (columns) of the matrix and thus right singular vectors.}
+\item{LW}{PARAM_DESCRIPTION}
 
-\item{k}{total number of components to return though the full variance will still be returned (see \code{d_full}). If 0, the full set of components are returned.}
+\item{RW}{PARAM_DESCRIPTION}
 
-\item{tol}{default is .Machine$double.eps. A tolerance level for eliminating effectively zero (small variance), negative, imaginary eigen/singular value components.}
+\item{k}{the desired rank of the singular decomposition, Default: 0}
+
+\item{tol}{PARAM_DESCRIPTION, Default: .Machine$double.eps}
+
+\item{init}{How to initialize the algorithm, Default: 'svd'}
+
+\item{initLeft}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{initRight}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{seed}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{rdsLeft}{The radius (>0) of the
+$L_1$ ball for each left vector, Default: rep(1, k)}
+
+\item{rdsRight}{The radius (>0) of the $L_1$ balls for each right vector, Default: rep(1, k)}
+
+\item{grpLeft}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{grpRight}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{orthogonality}{PARAM_DESCRIPTION, Default: 'loadings'}
+
+\item{OrthSpaceLeft}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{OrthSpaceRight}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{projPriority}{PARAM_DESCRIPTION, Default: 'orth'}
+
+\item{projPriorityLeft}{PARAM_DESCRIPTION, Default: projPriority}
+
+\item{projPriorityRight}{PARAM_DESCRIPTION, Default: projPriority}
+
+\item{itermaxALS}{The maximum number of ALS iterations, Default: 1000}
+
+\item{itermaxPOCS}{The maximum number of the POCs iterations, Default: 1000}
+
+\item{epsALS}{Precision in ALS, Default: 1e-10}
+
+\item{epsPOCS}{Precision in POCs, Default: 1e-10}
 }
 \value{
-A list with eleven elements:
-\item{d_full}{A vector containing the singular values of X above the tolerance threshold (based on eigenvalues).}
-\item{l_full}{A vector containing the eigen values of X above the tolerance threshold (\code{tol}).}
-\item{d}{A vector of length \code{min(length(d_full), k)} containing the retained singular values of X}
-\item{l}{A vector of length \code{min(length(l_full), k)} containing the retained eigen values of X}
-\item{u}{Left (rows) singular vectors. Dimensions are \code{nrow(X)} by k.}
-\item{p}{Left (rows) generalized singular vectors. Dimensions are \code{nrow(X)} by k.}
-\item{fi}{Left (rows) component scores. Dimensions are \code{nrow(X)} by k.}
-\item{v}{Right (columns) singular vectors. Dimensions are \code{ncol(X)} by k.}
-\item{q}{Right (columns) generalized singular vectors. Dimensions are \code{ncol(X)} by k.}
-\item{fj}{Right (columns) component scores. Dimensions are \code{ncol(X)} by k.}
+Pseudo-singular vectors and values
 }
 \description{
-\code{gsvd} takes in left (\code{LW}) and right (\code{RW}) constraints (usually diagonal matrices, but any positive semi-definite matrix is fine) that are applied to the data (\code{X}).
-  Left and right constraints are used for the orthogonality conditions.
+Constrained SVD of a matrix (wrapper of c++ functions).
+}
+\details{
+DETAILS
 }
 \examples{
-
- data(wine, package="GSVD")
- wine.objective <- wine$objective
- ## Principal components analysis: "covariance"
- ## "covariance" PCA
- cov.pca.data <- scale(wine.objective,scale=FALSE)
- cov.pca.res <- gsvd(cov.pca.data)
-
- ## Principal components analysis: "correlation"
- cor.pca.data <- scale(wine.objective,scale=TRUE)
- cor.pca.res <- gsvd(cor.pca.data)
-
- ## Principal components analysis: "correlation" with the covariance matrix and constraints
- cor.pca.res2 <- gsvd(cov.pca.data,RW=1/apply(wine.objective,2,var))
-
-
- ## Correspondence analysis
- data(authors, package="GSVD")
- Observed <- authors/sum(authors)
- row.w <- rowSums(Observed)
- col.w <- colSums(Observed)
- Expected <- row.w \%o\% col.w
- Deviations <- Observed - Expected
- ca.res <- gsvd(Deviations,1/row.w,1/col.w)
-
-
- ## Multiple correspondence analysis
- data("snps.druguse", package="GSVD")
- X <- model.matrix(~ .,
-     data=snps.druguse$DATA1,
-     contrasts.arg = lapply(snps.druguse$DATA1, contrasts, contrasts=FALSE))[,-1]
- Observed <- X/sum(X)
- row.w <- rowSums(Observed)
- col.w <- colSums(Observed)
- Expected <- row.w \%o\% col.w
- Deviations <- Observed - Expected
- ca.res <- gsvd(Deviations,1/row.w,1/col.w)
-
+X <- matrix(rnorm(20), 5, 4)
+sparseSVD(X)
+\dontrun{
+if(interactive()){
+ #EXAMPLE1
+ }
 }
-\seealso{
-\code{\link{tolerance_svd}}, \code{\link{geigen}} and \code{\link{gplssvd}}
 }
 \author{
-Derek Beaton
+Vincent Guillemot, Ju-Chi Yu
 }
-\keyword{multivariate}
