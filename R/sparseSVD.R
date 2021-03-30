@@ -86,8 +86,13 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
       itermaxALS = 1000, itermaxPOCS = 1000,
       epsALS = 1e-10, epsPOCS = 1e-10)
 
+    if (all(res.als$u == 0) | all(res.als$v == 0)) {
+      stop ("Too many components are estimated. Try extracting fewer components.")
+    }
+
     U[, r] <- res.als$u
     V[, r] <- res.als$v
+
 
     if (!is.null(Y)) {
       U.Rv[, r] <- projL2(Data %*% V[, r])$x
@@ -97,14 +102,14 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
     if (orthogonality == "loadings") {
       OrthSpaceLeft <- U[,(1:r),drop=FALSE]
       OrthSpaceRight <- V[,(1:r),drop=FALSE]
-    }else if (orthogonality == "score") {
+    }else if (orthogonality == "scores") {
       if (is.null(Y))
-        stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
+        stop ("Y is missing! The `scores` orthogonality option is for two-table methods.")
       OrthSpaceLeft <- U.Rv[,(1:r),drop=FALSE]
       OrthSpaceRight <- V.Ru[,(1:r),drop=FALSE]
     }else if (orthogonality == "both") {
       if (is.null(Y))
-        stop ("Y is missing! The `score` orthogonality option is for two-table methods.")
+        stop ("Y is missing! The `both` orthogonality option is for two-table methods.")
       ULx.bind <- cbind(U[,(1:r),drop=FALSE],U.Rv[,(1:r),drop=FALSE])
       VLy.bind <- cbind(V[,(1:r),drop=FALSE],V.Ru[,(1:r),drop=FALSE])
       ULx <- unique.column(ULx.bind, n.round = 10)
@@ -113,9 +118,8 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
       OrthSpaceLeft <- qr.Q(qr(ULx))
       OrthSpaceRight <- qr.Q(qr(VLy))
     }else {
-      stop ("Check what you entered for orthogonality. Please use eiter loadings (default), score, or both.")
+      stop ("Check what you entered for orthogonality. Please use eiter loadings (default), scores, or both.")
     }
-
 
     iter[r,] <- c(res.als$iterTOTAL, res.als$iterALS)
     d[r] <- res.als$d

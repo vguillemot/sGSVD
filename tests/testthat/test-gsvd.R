@@ -34,7 +34,7 @@ plscor_results <- pls_cor(wine$objective, wine$subjective, components = 0)
 # run sPLSC with no sparsification
 spls.res.both <- sparseGSVD(X4svd, Y4svd, orthogonality = "both", k = 5L, rdsLeft = rep(sqrt(ncol(wine$objective)), 5), rdsRight = rep(sqrt(ncol(wine$subjective)), 5))
 spls.res.loadings <- sparseGSVD(X4svd, Y4svd, orthogonality = "loadings", k = 5L, rdsLeft = rep(sqrt(ncol(wine$objective)), 5), rdsRight = rep(sqrt(ncol(wine$subjective)), 5))
-spls.res.score <- sparseGSVD(X4svd, Y4svd, orthogonality = "score", k = 5L, rdsLeft = rep(sqrt(ncol(wine$objective)), 5), rdsRight = rep(sqrt(ncol(wine$subjective)), 5))
+spls.res.score <- sparseGSVD(X4svd, Y4svd, orthogonality = "scores", k = 5L, rdsLeft = rep(sqrt(ncol(wine$objective)), 5), rdsRight = rep(sqrt(ncol(wine$subjective)), 5))
 
 test_that("sparsePLSC gives back plain PLSC (orthogonality = both)", {
   expect_equal(abs(spls.res.both$U), abs(plscor_results$u), tolerance = tol)
@@ -52,7 +52,7 @@ test_that("sparsePLSC gives back plain PLSC (orthogonality = loadings)", {
   expect_equal(abs(spls.res.loadings$fj), abs(plscor_results$fj), tolerance = tol)
 })
 
-test_that("sparsePLSC gives back plain PLSC (orthogonality = score)", {
+test_that("sparsePLSC gives back plain PLSC (orthogonality = scores)", {
   expect_equal(abs(spls.res.score$U), abs(plscor_results$u), tolerance = tol)
   expect_equal(abs(spls.res.score$V), abs(plscor_results$v), tolerance = tol)
   expect_equal(abs(spls.res.score$d), abs(plscor_results$d), tolerance = tol)
