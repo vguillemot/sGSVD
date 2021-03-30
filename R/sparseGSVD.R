@@ -165,12 +165,10 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
 
     if ( !LM_is_vector ){
       if ( Y_is_missing ){
+        stop("gsvd: RM is only used when there are two data tables")
+      }else{
         if ( nrow(LM) != ncol(LM) | nrow(LM) != X_dimensions[1] ){
           stop("gsvd: nrow(LM) does not equal ncol(LM) or nrow(X)")
-        }
-      }else{
-        if ( nrow(LM) != ncol(LM) | nrow(LM) != X_dimensions[2] ){
-          stop("gsvd: nrow(LM) does not equal ncol(LM) or ncol(X)")
         }
       }
       # if you gave me all zeros, I'm stopping.
@@ -181,18 +179,13 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
 
     if(LM_is_vector){
       if ( Y_is_missing ){
+        stop("gsvd: RM is only used when there are two data tables")
+      }else{
         if(length(LM)!=X_dimensions[1]){
           stop("gsvd: length(LM) does not equal nrow(X)")
         }
-      }else{
-        if(length(LM)!=X_dimensions[2]){
-          stop("gsvd: length(LM) does not equal ncol(X)")
-        }
       }
-
-
       # if you gave me all zeros, I'm stopping.
-      # if(all(abs(LM)<=tol)){
       if(!are_all_values_positive(LM)){
         stop("gsvd: LM is not strictly positive values")
       }
@@ -207,12 +200,10 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
 
     if ( !RM_is_vector ){
       if ( Y_is_missing ){
-        if( nrow(RM) != ncol(RM) | nrow(RM) != X_dimensions[2] ){
-          stop("gsvd: nrow(RM) does not equal ncol(RM) or ncol(X)")
-        }
+          stop("gsvd: RM is only used when there are two data tables")
       }else{
-        if( nrow(RM) != ncol(RM) | nrow(RM) != Y_dimensions[2] ){
-          stop("gsvd: nrow(RM) does not equal ncol(RM) or ncol(Y)")
+        if( nrow(RM) != ncol(RM) | nrow(RM) != Y_dimensions[1] ){
+          stop("gsvd: nrow(RM) does not equal ncol(RM) or nrow(Y)")
         }
       }
       # if you gave me all zeros, I'm stopping.
@@ -223,17 +214,13 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
 
     if(RM_is_vector){
       if ( Y_is_missing ){
-        if(length(RM)!=X_dimensions[2]){
-          stop("gsvd: length(RM) does not equal ncol(X)")
-        }
+        stop("gsvd: RM is only used when there are two data tables")
       }else{
-        if(length(RM)!=Y_dimensions[2]){
-          stop("gsvd: length(RM) does not equal ncol(Y)")
+        if(length(RM)!=Y_dimensions[1]){
+          stop("gsvd: length(RM) does not equal nrow(Y)")
         }
       }
-
       # if you gave me all zeros, I'm stopping.
-      # if(all(abs(RM)<=tol)){
       if(!are_all_values_positive(RM)){
         stop("gsvd: RM is not strictly positive values")
       }
