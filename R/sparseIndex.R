@@ -34,9 +34,9 @@ sparseIndex <- function(X, res.gsvd, tol = 1e-16) {
   r3 <- n0inV / (J * R)
   r4 <- (n0inU + n0inV) / ((I + J) * R)
   # Combine
-  SI1 <- gmean(c(r1, mean(c(r2 + r3))))
+  SI1 <- gmean(c(r1, mean(c(r2, r3))))
   SI2 <- gmean(c(r1, r4))
-  SI3 <- r1 * mean(c(r2 + r3))
+  SI3 <- r1 * mean(c(r2, r3))
   SI4 <- r1 * r4
   SI5 <- gmean(c(r1, radiusIndexLeftG, radiusIndexRightG))
   SI6 <- prod(c(r1, radiusIndexLeftG, radiusIndexRightG))

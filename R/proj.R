@@ -47,8 +47,10 @@ projL2 <- function(vec, rds) {
 
 projL1L2 <- function(vec, rds) {
   norm2_x <- normL2(vec)
-  if (norm2_x < .Machine$double.eps)
+  if (norm2_x < .Machine$double.eps) {
+    warning("Projecting a vector with a very small L2-norm!")
     return(list(x = 0 * vec, lambda = NA, k = NaN))
+  }
   if (sum(abs(vec / norm2_x)) <= rds)
     return(list(
       x = vec / norm2_x,
@@ -63,11 +65,15 @@ projL1L2 <- function(vec, rds) {
   bMAX <- p == MAX
   nMAX <- sum(bMAX)
   if (rds < sqrt(nMAX)) {
-    stop("Impossible to project, minimum ratio is : ", sqrt(nMAX))
+    warning("Minimum radius is: ", sqrt(nMAX))
+    x_soft        <- rep(0, length(vec))
+    x_soft[abs(vec) == MAX]  <- 1 / sqrt(nMAX)
+    return(list(x = x_soft, lambda = MAX, k = NaN))
   } else if (rds == sqrt(nMAX)) {
     warning("radius is equal to sqrt(nMAX)")
     x_soft        <- rep(0, length(vec))
-    x_soft[bMAX]  <- 1 / sqrt(nMAX)
+    x_soft[abs(vec) == MAX]  <- 1 / sqrt(nMAX)
+    # x_soft[bMAX]  <- 1 / sqrt(nMAX)
     return(list(x = x_soft, lambda = MAX, k = NaN))
   }
   #Initialize parameters
