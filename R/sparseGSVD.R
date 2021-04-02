@@ -1,5 +1,6 @@
 #' @title Sparse Generalized Singular Value Decomposition
 #' @description Constrained SVD of a matrix (wrapper of c++ functions).
+#'
 #' @param X a (data) matrix;
 #' @param Y a second (data) matrix; this is optional and is only used for a two-table method, Default: NULL
 #' @param LW PARAM_DESCRIPTION
@@ -24,7 +25,11 @@
 #' @param itermaxALS The maximum number of ALS iterations, Default: 1000
 #' @param itermaxPOCS The maximum number of the POCs iterations, Default: 1000
 #' @param epsALS Precision in ALS, Default: 1e-10
+#' @param LM
+#' @param RM
 #' @param epsPOCS Precision in POCs, Default: 1e-10
+#' @param tol.si Tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps
+#'
 #' @return Pseudo-singular vectors and values
 #' @details DETAILS
 #' @examples
@@ -50,7 +55,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
                        projPriorityLeft = projPriority,
                        projPriorityRight = projPriority,
                        itermaxALS = 1000, itermaxPOCS = 1000,
-                       epsALS = 1e-10, epsPOCS = 1e-10){
+                       epsALS = 1e-10, epsPOCS = 1e-10, tol.si = .Machine$double.eps){
 
   # preliminaries
   Y_is_missing <- missing(Y)
