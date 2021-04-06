@@ -246,8 +246,12 @@ projLGL2 <- function(vec, rds, grp) {
 projOrth <- function(vec, OrthSpace) {
   Mtx <- t(OrthSpace) %*% vec
   MMtx <- OrthSpace %*% Mtx
+  res <- vec - MMtx
+  # If the vector is almost null, then replace
+  # it by a random vector
+  if (normL2(res) < 1e-16) res <- projL2(rnorm(length(res)))$x
   return(list(
-    x = vec - MMtx,
+    x = res,
     lambda = NA,
     k = NaN
   ))

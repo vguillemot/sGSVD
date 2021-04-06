@@ -102,22 +102,31 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
     if (orthogonality == "loadings") {
       OrthSpaceLeft <- U[,(1:r),drop=FALSE]
       OrthSpaceRight <- V[,(1:r),drop=FALSE]
-    }else if (orthogonality == "scores") {
+    } else if (orthogonality == "scores") {
       if (is.null(Y))
         stop ("Y is missing! The `scores` orthogonality option is for two-table methods.")
       OrthSpaceLeft <- U.Rv[,(1:r),drop=FALSE]
       OrthSpaceRight <- V.Ru[,(1:r),drop=FALSE]
-    }else if (orthogonality == "both") {
+    } else if (orthogonality == "both") {
       if (is.null(Y))
         stop ("Y is missing! The `both` orthogonality option is for two-table methods.")
-      ULx.bind <- cbind(U[,(1:r),drop=FALSE],U.Rv[,(1:r),drop=FALSE])
-      VLy.bind <- cbind(V[,(1:r),drop=FALSE],V.Ru[,(1:r),drop=FALSE])
+      ULx.bind <- cbind(U[, (1:r), drop = FALSE],
+                        U.Rv[, (1:r), drop = FALSE])
+      VLy.bind <- cbind(V[, (1:r), drop = FALSE],
+                        V.Ru[, (1:r), drop = FALSE])
       ULx <- unique.column(ULx.bind, n.round = 10)
       VLy <- unique.column(VLy.bind, n.round = 10)
 
-      OrthSpaceLeft <- qr.Q(qr(ULx))
-      OrthSpaceRight <- qr.Q(qr(VLy))
-    }else {
+      ## Replace QR by SVD to avoid strange behaviors
+      # OrthSpaceLeft <- qr.Q(qr(ULx))
+      # OrthSpaceRight <- qr.Q(qr(VLy))
+
+      res.svd.left <- svd(ULx, nv = 0)
+      res.svd.right <- svd(VLy, nv = 0)
+
+      OrthSpaceLeft <- res.svd.left$u[, res.svd.left$d > 1e-16, drop = FALSE]
+      OrthSpaceRight <- res.svd.right$u[, res.svd.right$d > 1e-16, drop = FALSE]
+    } else {
       stop ("Check what you entered for orthogonality. Please use eiter loadings (default), scores, or both.")
     }
 
@@ -190,7 +199,7 @@ initializeSVD <- function(X, I, J, k, init, initLeft, initRight, seed = NULL) {
     if (initLeft == "svd") {
       U0 <- svdx$u
     } else if (initLeft == "rand") {
-      U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+      U0 <- 1/(I-1) * MASS::mvrnorm(n = I, mu = rep(0,k),
                               Sigma = diag(k), empirical = TRUE)
     } else {
       U0 <- initLeft
@@ -199,7 +208,7 @@ initializeSVD <- function(X, I, J, k, init, initLeft, initRight, seed = NULL) {
     if (initRight == "svd") {
       V0 <- svdx$u
     } else if (initRight == "rand") {
-      V0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+      V0 <- 1/(I-1) * MASS::mvrnorm(n = I, mu = rep(0,k),
                               Sigma = diag(k), empirical = TRUE)
     } else {
       V0 <- initRight
@@ -208,9 +217,9 @@ initializeSVD <- function(X, I, J, k, init, initLeft, initRight, seed = NULL) {
     U0 <- svdx$u
     V0 <- svdx$v
   } else if ( init=="rand") {
-    U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+    U0 <- 1/(I-1) * MASS::mvrnorm(n = I, mu = rep(0,k),
                             Sigma = diag(k), empirical = TRUE)
-    V0 <- 1/(J-1) * mvrnorm(n = J, mu = rep(0,k),
+    V0 <- 1/(J-1) * MASS::mvrnorm(n = J, mu = rep(0,k),
                             Sigma = diag(k), empirical = TRUE)
   } else {
     stop("Unkown error, contact support!")
