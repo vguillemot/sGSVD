@@ -30,7 +30,8 @@ sparseGSVD(
   itermaxALS = 1000,
   itermaxPOCS = 1000,
   epsALS = 1e-10,
-  epsPOCS = 1e-10
+  epsPOCS = 1e-10,
+  tol.si = .Machine$double.eps
 )
 }
 \arguments{
@@ -82,6 +83,8 @@ $L_1$ ball for each left vector, Default: rep(1, k)}
 \item{epsALS}{Precision in ALS, Default: 1e-10}
 
 \item{epsPOCS}{Precision in POCs, Default: 1e-10}
+
+\item{tol.si}{Tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps}
 }
 \value{
 Pseudo-singular vectors and values

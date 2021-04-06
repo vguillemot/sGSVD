@@ -65,5 +65,7 @@ sparseIndex <- function(X, res.gsvd, tol = 1e-16) {
 #' @examples
 #' gmean(c(0.5, 0.5))
 gmean <- function(x, na.rm = TRUE) {
+  if (any(abs(x) < 2*.Machine$double.eps)) return(0)
+  if (any(x < 0)) return(0)
   exp(mean(log(x), na.rm = na.rm))
 }
