@@ -22,6 +22,7 @@
 NULL
 
 #' @rdname proj
+#' @export
 
 projL1 <- function(vec, rds) {
   if (normL1(vec) <= rds) return(v)
@@ -35,6 +36,7 @@ projL1 <- function(vec, rds) {
 }
 
 #' @rdname proj
+#' @export
 
 projL2 <- function(vec, rds) {
   norm2x <- normL2(vec)
@@ -44,6 +46,7 @@ projL2 <- function(vec, rds) {
 }
 
 #' @rdname proj
+#' @export
 
 projL1L2 <- function(vec, rds) {
   norm2_x <- normL2(vec)
@@ -139,6 +142,7 @@ projL1L2 <- function(vec, rds) {
 }
 
 #' @rdname proj
+#' @export
 
 projLG <- function(vec, rds, grp) {
   if (normLG(vec, grp) <= rds)
@@ -151,6 +155,8 @@ projLG <- function(vec, rds, grp) {
 }
 
 #' @rdname proj
+#' @export
+
 projLGL2 <- function(vec, rds, grp) {
   grpvec <- tapply(vec, grp, normL2)
   norm2_x <- normL2(grpvec)
@@ -243,6 +249,8 @@ projLGL2 <- function(vec, rds, grp) {
 }
 
 #' @rdname proj
+#' @export
+
 projOrth <- function(vec, OrthSpace) {
   Mtx <- t(OrthSpace) %*% vec
   MMtx <- OrthSpace %*% Mtx
@@ -258,6 +266,8 @@ projOrth <- function(vec, OrthSpace) {
 }
 
 #' @rdname proj
+#' @export
+
 projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps) {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
@@ -269,6 +279,7 @@ projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
 }
 
 #' @rdname proj
+#' @export
 projLGL2_then_projOrth <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
@@ -280,6 +291,7 @@ projLGL2_then_projOrth <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
 }
 
 #' @rdname proj
+#' @export
 projOrth_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
@@ -291,6 +303,7 @@ projOrth_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
 }
 
 #' @rdname proj
+#' @export
 projOrth_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
