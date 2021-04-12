@@ -37,6 +37,9 @@ als <- function(X, initLeft, initRight, projLeft, projRight, rdsLeft, rdsRight, 
     vold <- vnew
     uold <- unew
   }
+  # print(res.projLeft$lambda)
+  # print(res.projRight$lambda)
+
   d <- drop(t(unew) %*% X %*% vnew)
   return(list(d = d, u = unew, v = vnew, iterALS = iter, iterTOTAL = iterTOTAL))
 }
@@ -52,6 +55,7 @@ powerIteration <- function(X, init, proj, rds, grp = NULL, OrthSpace, itermaxALS
     if ( normL2(unew - uold) < epsALS ) break
     uold <- unew
   }
+
   lambda <- drop(t(unew) %*% X %*% unew)
   return(list(lambda = lambda, u = unew, iterALS = iter, iterTOTAL = iterTOTAL))
 }

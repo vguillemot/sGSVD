@@ -25,7 +25,9 @@ NULL
 #' @export
 
 projL1 <- function(vec, rds) {
-  if (normL1(vec) <= rds) return(v)
+  if (normL1(vec) <= rds) {
+    return(list(x = vec, lambda = 0, k = NaN))
+  }
   u <- sort(abs(vec), decreasing = TRUE)
   n <- length(vec)
   ukmaok <- (cumsum(u) - rds)/(1:n)
@@ -275,7 +277,8 @@ projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  return(list(x = vecnew, lambda = NA, k = iter))
+  res.projL1L2 <- projL1L2(vecold, rds)
+  return(list(x = vecnew, lambda = res.projL1L2$lambda, k = iter))
 }
 
 #' @rdname proj
@@ -287,7 +290,8 @@ projLGL2_then_projOrth <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  return(list(x = vecnew, lambda = NA, k = iter))
+  res.projLGL2 <- projLGL2(vecold, rds, grp)
+  return(list(x = vecnew, lambda = res.projLGL2$lambda, k = iter))
 }
 
 #' @rdname proj
@@ -299,7 +303,8 @@ projOrth_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
       if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  return(list(x = vecnew, lambda = NA, k = iter))
+  res.projL1L2 <- projL1L2(projOrth(vecold, OrthSpace)$x, rds)
+  return(list(x = vecnew, lambda = res.projL1L2$lambda, k = iter))
 }
 
 #' @rdname proj
@@ -311,7 +316,8 @@ projOrth_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
       if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  return(list(x = vecnew, lambda = NA, k = iter))
+  res.projLGL2 <- projLGL2(projOrth(vecold, OrthSpace)$x, rds, grp)
+  return(list(x = vecnew, lambda = res.projLGL2$lambda, k = iter))
 }
 
 
