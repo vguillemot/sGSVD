@@ -18,20 +18,24 @@
 #' proxLG(x, lamb, g) # ~= (-0.1, 0.5, 0)
 NULL
 #' @rdname prox
+#' @export
 proxL1 <- function(vec, lambda) {
   return(sign(vec)*pmax(0, abs(vec) - lambda))
 }
 #' @rdname prox
+#' @export
 proxL2 <- function(vec, lambda) {
   norm2x <- normL2(vec)
   if (norm2x < .Machine$double.eps) return(0*vec)
   return(vec * max(0, (norm2x - lambda) / norm2x))
 }
 #' @rdname prox
+#' @export
 proxLG <- function(vec, lambda, grp) {
   return(ave(vec, grp, FUN = function(xsub) proxL2(xsub, lambda)))
 }
 #' @rdname prox
+#' @export
 proxLG2 <- function(vec, lambda, grp) {
   zenormg <- ave(vec, grp, FUN = normL2)
   boolu <- (zenormg >= lambda) + 0
