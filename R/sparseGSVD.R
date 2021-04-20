@@ -451,7 +451,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
   # Compute the Sparse Index
   res$rdsLeft <- rdsLeft
   res$rdsRight <- rdsRight
-  res.SI <- sparseIndex(X = X, res.gsvd = res, tol = tol.si)
+  res.SI <- sparseIndex(res.sgsvd = res, singularValues = svd(X, 0, 0)$d, tol = tol.si)
   res$SI <- res.SI
 
 

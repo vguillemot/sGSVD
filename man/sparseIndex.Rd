@@ -2,20 +2,27 @@
 % Please edit documentation in R/sparseIndex.R
 \name{sparseIndex}
 \alias{sparseIndex}
-\title{Compute a sparse index on the results of a sparse GSVD}
+\title{Compute sparse indices on the results of a sparse GSVD}
 \usage{
-sparseIndex(X, res.gsvd, tol = 1e-16)
+sparseIndex(res.sgsvd, singularValues, tol = 1e-16)
 }
 \arguments{
-\item{X}{the data matrix}
+\item{res.sgsvd}{The result of a sparse Generalized Singular Value Decomposition of a data-matrix, usually obtained with sGSVD::sparseGSVD or one of the companion functions in the SPAFAC package ;}
 
-\item{res.gsvd}{the result of a sparse GSVD of X}
+\item{singularValues}{The singular values of the original data matrix (used to compute the fit of the sparse analysis)}
 
 \item{tol}{a tolerance parameter indicating when a small value should be considered equal to 0}
 }
 \value{
-
+various sparsity indices and their components.
 }
 \description{
-Compute a sparse index on the results of a sparse GSVD
+Compute sparse indices on the results of a sparse GSVD
+}
+\examples{
+set.seed(2045)
+X <- matrix(rnorm(20), 4, 5)
+res.svd <- svd(X)
+res.sgsvd <- sparseGSVD(X, k = 2L)
+sparseIndex(res.sgsvd, res.svd$d)
 }

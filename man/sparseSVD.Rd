@@ -2,7 +2,7 @@
 % Please edit documentation in R/sparseSVD.R
 \name{sparseSVD}
 \alias{sparseSVD}
-\title{Constrained SVD of a matrix (wrapper of c++ functions).}
+\title{Constrained SVD of a matrix.}
 \usage{
 sparseSVD(
   X,
@@ -29,29 +29,45 @@ sparseSVD(
 )
 }
 \arguments{
-\item{X}{a (data) matrix;}
+\item{X}{a (data) matrix ;}
 
-\item{Y}{a second (data) matrix; this is optional and is only used for a two-table method}
+\item{Y}{a second (data) matrix ; this is optional and is only used for two-table methods ;}
 
-\item{k}{the desired rank of the singular decomposition;}
+\item{k}{the desired rank of the singular decomposition ;}
 
-\item{init}{How to initialize the algorithm}
+\item{init}{how the pseudo-singular vectors are initialized ; default to "svd", meaning that they are initialized with regular singular vectors ; any other value will initialize them randomly ;}
 
-\item{au}{The radiuses (radii?) (>0) of the
-$L_1$ ball for each left vector}
+\item{initLeft}{how the left pseudo-singular vectors are initialized ; default to the same value as "init" ;}
 
-\item{av}{The radiuses (radii)?
-(>0) of the $L_1$ balls for each right vector}
+\item{initRight}{how the right pseudo-singular vectors are initialized ; default to the same value as "init" ;}
 
-\item{itermax}{The maximum number of iterations}
+\item{seed}{a random seed for result reproducibility ; if NULL (the default), no random seed will be used ;}
 
-\item{eps}{Precision}
+\item{rdsLeft}{a vector of radiuses
+(>0) of the $L_1$ or $L_G$ balls for each of the k left vectors ;}
+
+\item{rdsRight}{a vector of radiuses
+(>0) of the $L_1$ or $L_G$ balls for each of the k right vectors ;}
+
+\item{grpLeft}{vector describing the groups for the left vectors ; default to one group per row ;}
+
+\item{grpRight}{vector describing the groups for the right vectors ; default to one group per column ;}
+
+\item{orthogonality}{wh the orthogonality constraint will}
+
+\item{itermaxALS}{The maximum number of ALS iterations}
+
+\item{itermaxPOCS}{The maximum number of POCS iterations}
+
+\item{epsALS}{Precision for ALS}
+
+\item{epsPOCS}{Precision for POCS}
 }
 \value{
 Pseudo-singular vectors and values
 }
 \description{
-Constrained SVD of a matrix (wrapper of c++ functions).
+Constrained SVD of a matrix.
 }
 \examples{
 X <- matrix(rnorm(20), 5, 4)
