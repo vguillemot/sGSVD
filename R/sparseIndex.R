@@ -18,7 +18,7 @@ sparseIndex <- function(res.sgsvd, singularValues, tol = 1e-16) {
   U <- res.sgsvd$U
   V <- res.sgsvd$V
   I <- NROW(U)
-  J <- NCOL(V)
+  J <- NROW(V)
   rdsLeft <- res.sgsvd$rdsLeft
   rdsRight <- res.sgsvd$rdsRight
   # Compute the fit part of the index
@@ -71,7 +71,7 @@ sparseIndex <- function(res.sgsvd, singularValues, tol = 1e-16) {
     SI7 = SI7, SI7left = SI7left, SI7right = SI7right,
     r1 = r1, r2 = r2, r3 = r3, r4 = r4,
     n0inU = n0inU, n0inV = n0inV,
-    rdsLeft = rdsRight, rdsLeft = rdsRight,
+    rdsLeft = rdsLeft, rdsRight = rdsRight,
     radiusIndexLeftG = radiusIndexLeftG,
     radiusIndexRightG = radiusIndexRightG,
     radiusIndexLeftA = radiusIndexLeftA,
