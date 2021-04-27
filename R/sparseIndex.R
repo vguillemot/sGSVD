@@ -1,28 +1,33 @@
-#' Compute a sparse index on the results of a sparse GSVD
+#' Compute sparse indices on the results of a sparse GSVD
 #'
-#' @param X the data matrix
-#' @param res.gsvd the result of a sparse GSVD of X
+#' @param res.sgsvd The result of a sparse Generalized Singular Value Decomposition of a data-matrix, usually obtained with sGSVD::sparseGSVD or one of the companion functions in the SPAFAC package ;
+#' @param singularValues The singular values of the original data matrix (used to compute the fit of the sparse analysis)
 #' @param tol a tolerance parameter indicating when a small value should be considered equal to 0
 #'
-#' @return
+#' @return various sparsity indices and their components.
 #' @export
 #'
 #' @examples
-sparseIndex <- function(X, res.gsvd, tol = 1e-16) {
-  R <- length(res.gsvd$d)
-  I <- nrow(X)
-  J <- ncol(X)
-  rdsLeft <- res.gsvd$rdsLeft
-  rdsRight <- res.gsvd$rdsRight
+#' set.seed(2045)
+#' X <- matrix(rnorm(20), 4, 5)
+#' res.svd <- svd(X)
+#' res.sgsvd <- sparseGSVD(X, k = 2L)
+#' sparseIndex(res.sgsvd, res.svd$d)
+sparseIndex <- function(res.sgsvd, singularValues, tol = 1e-16) {
+  R <- length(res.sgsvd$d)
+  U <- res.sgsvd$U
+  V <- res.sgsvd$V
+  I <- NROW(U)
+  J <- NROW(V)
+  rdsLeft <- res.sgsvd$rdsLeft
+  rdsRight <- res.sgsvd$rdsRight
   # Compute the fit part of the index
-  d0_full <- svd(X, nu = 0, nv = 0)$d
-  d0 <- d0_full[1:R]
-  dsparse <- res.gsvd$d
+  d0 <- singularValues[1:R]
+  dsparse <- res.sgsvd$d
   r1 <- sum(dsparse^2) / sum(d0^2)
 
   # Compute the sparsity part of the index
-  U <- res.gsvd$U
-  V <- res.gsvd$V
+
   n0inU <- sum(abs(U) <= tol)
   n0inV <- sum(abs(V) <= tol)
   radiusIndexLeftG <- gmean(rdsLeft / sqrt(I))
@@ -35,22 +40,42 @@ sparseIndex <- function(X, res.gsvd, tol = 1e-16) {
   r4 <- (n0inU + n0inV) / ((I + J) * R)
   # Combine
   SI1 <- gmean(c(r1, mean(c(r2, r3))))
+  SI1left <- gmean(c(r1, r2))
+  SI1right <- gmean(c(r1, r3))
   SI2 <- gmean(c(r1, r4))
+  SI2left <- gmean(c(r1, r2))
+  SI2right <- gmean(c(r1, r3))
   SI3 <- r1 * mean(c(r2, r3))
+  SI3left <- r1 * r2
+  SI3right <- r1 * r3
   SI4 <- r1 * r4
+  SI4left <- r1 * r2
+  SI4right <- r1 * r3
   SI5 <- gmean(c(r1, 1 - radiusIndexLeftG, 1 -  radiusIndexRightG))
+  SI5left <- gmean(c(r1, 1 - radiusIndexLeftG))
+  SI5right <- gmean(c(r1, 1 -  radiusIndexRightG))
   SI6 <- prod(c(r1, 1 - radiusIndexLeftG, 1 - radiusIndexRightG))
+  SI6left <- prod(c(r1, 1 - radiusIndexLeftG))
+  SI6right <- prod(c(r1, 1 - radiusIndexRightG))
   SI7 <- mean(c(r1, 1 - radiusIndexLeftA, 1 - radiusIndexRightA))
+  SI7left <- mean(c(r1, 1 - radiusIndexLeftA))
+  SI7right <- mean(c(r1, 1 - radiusIndexRightA))
 
-  return(list(SI1 = SI1, SI2 = SI2, SI3 = SI3, SI4 = SI4,
-              SI5 = SI5, SI6 = SI6, SI7 = SI7,
-              r1 = r1, r2 = r2, r3 = r3, r4 = r4,
-              n0inU = n0inU, n0inV = n0inV,
-              rdsLeft = rdsRight, rdsLeft = rdsRight,
-              radiusIndexLeftG = radiusIndexLeftG,
-              radiusIndexRightG = radiusIndexRightG,
-              radiusIndexLeftA = radiusIndexLeftA,
-              radiusIndexRightA = radiusIndexRightA))
+  return(list(
+    SI1 = SI1, SI1left = SI1left, SI1right = SI1right,
+    SI2 = SI2, SI2left = SI2left, SI2right = SI2right,
+    SI3 = SI3, SI3left = SI3left, SI3right = SI3right,
+    SI4 = SI4, SI4left = SI4left, SI4right = SI4right,
+    SI5 = SI5, SI5left = SI5left, SI5right = SI5right,
+    SI6 = SI6, SI6left = SI6left, SI6right = SI6right,
+    SI7 = SI7, SI7left = SI7left, SI7right = SI7right,
+    r1 = r1, r2 = r2, r3 = r3, r4 = r4,
+    n0inU = n0inU, n0inV = n0inV,
+    rdsLeft = rdsLeft, rdsRight = rdsRight,
+    radiusIndexLeftG = radiusIndexLeftG,
+    radiusIndexRightG = radiusIndexRightG,
+    radiusIndexLeftA = radiusIndexLeftA,
+    radiusIndexRightA = radiusIndexRightA))
 }
 
 

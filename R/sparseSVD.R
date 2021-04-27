@@ -1,15 +1,29 @@
-#' Constrained SVD of a matrix (wrapper of c++ functions).
+#' Constrained SVD of a matrix.
 #'
-#' @param X a (data) matrix;
-#' @param Y a second (data) matrix; this is optional and is only used for a two-table method
-#' @param k the desired rank of the singular decomposition;
-#' @param au The radiuses (radii?) (>0) of the
-#' $L_1$ ball for each left vector
-#' @param av The radiuses (radii)?
-#' (>0) of the $L_1$ balls for each right vector
-#' @param itermax The maximum number of iterations
-#' @param eps Precision
-#' @param init How to initialize the algorithm
+#' @param X a (data) matrix ;
+#' @param Y a second (data) matrix ; this is optional and is only used for two-table methods ;
+#' @param k the desired rank of the singular decomposition ;
+#' @param init how the pseudo-singular vectors are initialized ; default to "svd", meaning that they are initialized with regular singular vectors ; any other value will initialize them randomly ;
+#' @param initLeft how the left pseudo-singular vectors are initialized ; default to the same value as "init" ;
+#' @param initRight how the right pseudo-singular vectors are initialized ; default to the same value as "init" ;
+#' @param seed a random seed for result reproducibility ; if NULL (the default), no random seed will be used ;
+#' @param rdsLeft a vector of radiuses
+#' (>0) of the $L_1$ or $L_G$ balls for each of the k left vectors ;
+#' @param rdsRight a vector of radiuses
+#' (>0) of the $L_1$ or $L_G$ balls for each of the k right vectors ;
+#' @param grpLeft vector describing the groups for the left vectors ; default to one group per row ;
+#' @param grpRight vector describing the groups for the right vectors ; default to one group per column ;
+#' @param orthogonality wh the orthogonality constraint will
+#' @param OrthSpaceLeft
+#' @param OrthSpaceRight
+#' @param projPriority
+#' @param projPriorityLeft
+#' @param projPriorityRight
+#' @param itermaxALS The maximum number of ALS iterations
+#' @param itermaxPOCS The maximum number of POCS iterations
+#' @param epsALS Precision for ALS
+#' @param epsPOCS Precision for POCS
+#'
 #' @return Pseudo-singular vectors and values
 #' @examples
 #' X <- matrix(rnorm(20), 5, 4)
