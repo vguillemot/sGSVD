@@ -387,7 +387,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
   res$d_full <- res$d
   res$l_full <- res$d_full^2
   # res$tau <- (res$l_full/sum(res$l_full)) * 100
-  components.to.return <- min(length(res$d_full), k) #a safety check
+  components.to.return <- min(length(res$d_full), k) # a safety check
   res$d <- res$d_full[1:components.to.return]
   res$l <- res$d^2
   res$U <- res$U[,1:components.to.return, drop = FALSE]

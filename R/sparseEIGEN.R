@@ -1,7 +1,7 @@
 #' Constrained eigen-value decomposition of a symmetric matrix
 #'
 #' @param X a symmetric square (data) matrix;
-#' @param R the desired rank of the singular decomposition;
+#' @param k the desired rank of the singular decomposition;
 #' @param init How to initialize the algorithm
 #' @param rds The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension;
 #' @param seed
@@ -20,9 +20,9 @@
 #' sparseEIGEN(U %*% t(U))
 #' @author Vincent Guillemot
 #' @export
-sparseEIGEN <- function(X, R = 2L,
+sparseEIGEN <- function(X, k = 2L,
                  init = NULL, seed = NULL,
-                 rds = rep(1, R),
+                 rds = rep(1, k),
                  grp = NULL,
                  orthogonality = "loadings",
                  OrthSpace = NULL,
@@ -31,7 +31,7 @@ sparseEIGEN <- function(X, R = 2L,
                  epsALS = 1e-10, epsPOCS = 1e-10) {
 
   # Test that the arguments are valid
-  garb <- runTestsEIGEN(X, R, init, seed,
+  garb <- runTestsEIGEN(X, k, init, seed,
                    rds, grp,
                    orthogonality, OrthSpace,
                    projPriority)
@@ -40,21 +40,21 @@ sparseEIGEN <- function(X, R = 2L,
 
   # Build initialization matrices either with SVD (prefered method)
   # or randomly
-  res.init <- initializeEIGEN(X = X, I = I, R = R,
+  res.init <- initializeEIGEN(X = X, I = I, k = k,
                               init = init, seed = seed)
   U0 <- res.init$U0
   # Build projection based on the arguments
   proj <- makeComposedProjection(projPriority = projPriority, grp = grp)
 
   if (is.null(OrthSpace)) OrthSpace <- matrix(0, I, 1)
-  U <- matrix(0, I, R)
+  U <- matrix(0, I, k)
 
-  iter <- matrix(NA, R, 2,
-                 dimnames = list(paste0("Dim. ", 1:R),
+  iter <- matrix(NA, k, 2,
+                 dimnames = list(paste0("Dim. ", 1:k),
                                  c("Total", "ALS")))
-  lambda <- rep(NA, R)
+  lambda <- rep(NA, k)
 
-  for (r in 1:R) {
+  for (r in 1:k) {
     ## Power Iteration with orth projection
     res.powit <- powerIteration(
       X = X,                 # original matrix
@@ -77,12 +77,11 @@ sparseEIGEN <- function(X, R = 2L,
   }
 
   oD <- order(lambda, decreasing = TRUE)
-  # oD <- 1:R
-  res <- list(values = lambda[oD], vectors=U[,oD], iter=iter)
+  res <- list(values = lambda[oD], vectors = U[, oD], iter = iter)
   return(res)
 }
 
-runTestsEIGEN <- function(X, R, init, seed,
+runTestsEIGEN <- function(X, k, init, seed,
                          rds, grp,
                          orthogonality, OrthSpace,
                          projPriority) {
@@ -100,16 +99,13 @@ runTestsEIGEN <- function(X, R, init, seed,
   if (any(is.na(X)))
     stop("X should not contain missing values")
 
-  ##### Test R ####
-  if (!is.integer(R)) stop("R should be an integer.")
-  if (R <= 1) stop("R should be > 1.")
+  ##### Test k ####
+  if (!is.integer(k)) stop("k should be an integer.")
+  if (k <= 1) stop("k should be > 1.")
 
   ##### Test initialization ####
   if (is.null(init)) {
-    if (is.null(initLeft) | ! is.matrix(initLeft))
-      stop("initLeft should be a matrix.")
-    if (is.null(initRight)  | ! is.matrix(initRight))
-      stop("initRight should be a matrix.")
+    stop("init should be either svd or rand.")
   }
   if (! init %in% c("svd", "rand"))
     stop("init should be either svd or rand.")
@@ -117,16 +113,16 @@ runTestsEIGEN <- function(X, R, init, seed,
   return(NULL)
 }
 
-initializeEIGEN <- function(X, I, R, init, seed = NULL) {
+initializeEIGEN <- function(X, I, k, init, seed = NULL) {
 
   if (!is.null(seed)) set.seed(seed)
 
   if (init == "svd") {
-    svdx <- svd(X, nu=R, nv=R)
+    svdx <- svd(X, nu=k, nv=k)
     U0 <- svdx$u
   } else if (init == "rand") {
-    U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,R),
-                            Sigma = diag(R), empirical = TRUE)
+    U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+                            Sigma = diag(k), empirical = TRUE)
   } else {
     stop("Unkown error, please contact support!")
   }
