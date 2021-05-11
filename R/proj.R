@@ -162,8 +162,10 @@ projLG <- function(vec, rds, grp) {
 projLGL2 <- function(vec, rds, grp) {
   grpvec <- tapply(vec, grp, normL2)
   norm2_x <- normL2(grpvec)
-  if (norm2_x < .Machine$double.eps)
+  if (norm2_x < .Machine$double.eps) {
+    warning("Projecting a vector with a very small L2-norm!")
     return(list(x = 0 * vec, lambda = NA, k = NaN))
+  }
   if (normLG(projL2(vec)$x, grp) <= rds)
     return(list(
       x = projL2(vec)$x,
@@ -178,7 +180,10 @@ projLGL2 <- function(vec, rds, grp) {
   bMAX <- p == MAX
   nMAX <- sum(bMAX)
   if (rds < sqrt(nMAX)) {
-    stop("Impossible to project, minimum ratio is : ", sqrt(nMAX))
+    warning("Minimum radius is: ", sqrt(nMAX))
+    x_soft        <- rep(0, length(vec))
+    x_soft[abs(vec) == MAX]  <- 1 / sqrt(nMAX)
+    return(list(x = x_soft, lambda = MAX, k = NaN))
   } else if (rds == sqrt(nMAX)) {
     warning("radius is equal to sqrt(nMAX)")
     projvec <- rep(0, length(vec))
