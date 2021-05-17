@@ -22,6 +22,7 @@
 #' @param projPriority PARAM_DESCRIPTION, Default: 'orth'
 #' @param projPriorityLeft PARAM_DESCRIPTION, Default: projPriority
 #' @param projPriorityRight PARAM_DESCRIPTION, Default: projPriority
+#' @param correction4SI Correction for the explained variance for sparsity indices, e.g., "gsvd" (no correction), "mca" (Benzecri correction of MCA), or "mfa"
 #' @param itermaxALS The maximum number of ALS iterations, Default: 1000
 #' @param itermaxPOCS The maximum number of the POCs iterations, Default: 1000
 #' @param epsALS Precision in ALS, Default: 1e-10
@@ -54,6 +55,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
                        projPriority = "orth",
                        projPriorityLeft = projPriority,
                        projPriorityRight = projPriority,
+                       correction4SI = "gsvd",
                        itermaxALS = 1000, itermaxPOCS = 1000,
                        epsALS = 1e-10, epsPOCS = 1e-10, tol.si = .Machine$double.eps){
 
@@ -453,7 +455,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
   res$rdsRight <- rdsRight
   res$grpLeft <- grpLeft
   res$grpRight <- grpRight
-  res.SI <- sparseIndex(res.sgsvd = res, singularValues = svd(X, 0, 0)$d, tol = tol.si)
+  res.SI <- sparseIndex(res.sgsvd = res, singularValues = svd(X, 0, 0)$d, correction = correction4SI, tol = tol.si)
   res$SI <- res.SI
 
 

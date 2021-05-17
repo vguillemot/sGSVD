@@ -2,6 +2,7 @@
 #'
 #' @param res.sgsvd The result of a sparse Generalized Singular Value Decomposition of a data-matrix, usually obtained with sGSVD::sparseGSVD or one of the companion functions in the SPAFAC package ;
 #' @param singularValues The singular values of the original data matrix (used to compute the fit of the sparse analysis)
+#' @param correction The type of correction for proportion of explained variance (r1), e.g., "gsvd" (no correction), "mca", "mfa"
 #' @param tol a tolerance parameter indicating when a small value should be considered equal to 0
 #'
 #' @return various sparsity indices and their components.
@@ -13,18 +14,32 @@
 #' res.svd <- svd(X)
 #' res.sgsvd <- sparseGSVD(X, k = 2L)
 #' sparseIndex(res.sgsvd, res.svd$d)
-sparseIndex <- function(res.sgsvd, singularValues, tol = 1e-16) {
+sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e-16) {
   R <- length(res.sgsvd$d)
   U <- res.sgsvd$U
   V <- res.sgsvd$V
-  I <- NROW(U)
-  J <- NROW(V)
+  U.sq <- U^2
+  V.sq <- V^2
+  if (is.null(res.sgsvd$grpLeft)){
+    ctrLeft <- U.sq
+  }else{
+    ctrLeft <- apply(U.sq, 2, function(x) tapply(x, res.sgsvd$grpLeft, FUN = sum))
+  }
+  if (is.null(res.sgsvd$grpRight)){
+    ctrRight <- V.sq
+  }else{
+    ctrRight <- apply(V.sq, 2, function(x) tapply(x, res.sgsvd$grpRight, FUN = sum))
+  }
+  I <- NROW(ctrLeft)
+  J <- NROW(ctrRight)
   rdsLeft <- res.sgsvd$rdsLeft
   rdsRight <- res.sgsvd$rdsRight
+
   # Compute the fit part of the index
-  d0 <- singularValues[1:R]
-  dsparse <- res.sgsvd$d
-  r1 <- sum(dsparse^2) / sum(d0^2)
+  # d0 <- singularValues[1:R]
+  # dsparse <- res.sgsvd$d
+  # r1 <- sum(dsparse^2) / sum(d0^2)
+  r1 <- compute.fit(singularValues, res.sgsvd$d, J, correction = correction)
 
   # Compute the sparsity part of the index
 
@@ -93,4 +108,31 @@ gmean <- function(x, na.rm = TRUE) {
   if (any(abs(x) < 2*.Machine$double.eps)) return(0)
   if (any(x < 0)) return(0)
   exp(mean(log(x), na.rm = na.rm))
+}
+
+#' Compute r1 (the explained variance) for sparsity indices
+#'
+#' @param d a vector of singular values
+#' @param pseudo.d a vector of the pseudo singular values (from sparseGSVD)
+#' @param J the number of variables (for MCA correction)
+#' @param correction the type of correction, e.g., "gsvd" (no correction), "mca", "mfa"
+#'
+#' @return the corrected eigenvalues and tau
+#' @export
+#'
+#' @examples
+#'
+compute.fit <- function(d, pseudo.d, J, correction = "gsvd") {
+  if (correction == "mca"){
+    lambda <- (J/(J-1)*(d^2-(1/J)))^2
+    pseudo.lambda <- (J/(J-1)*(pseudo.d^2-(1/J)))^2
+    lambda[lambda < (1/J)] = 0
+    pseudo.lambda[pseudo.lambda < (1/J)] = 0
+    r1 <- sum(pseudo.lambda)/sum(lambda)
+  }else if (correction == "mfa"){
+    stop("MFA correction is not available yet.")
+  }else{
+    r1 <- sum(pseudo.d^2) / sum(d^2)
+  }
+  return(r1)
 }
