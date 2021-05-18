@@ -43,8 +43,8 @@ sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e
 
   # Compute the sparsity part of the index
 
-  n0inU <- sum(abs(U) <= tol)
-  n0inV <- sum(abs(V) <= tol)
+  n0inU <- sum(ctrLeft <= tol)
+  n0inV <- sum(ctrRight <= tol)
   radiusIndexLeftG <- gmean(rdsLeft / sqrt(I))
   radiusIndexRightG <- gmean(rdsRight / sqrt(J))
   radiusIndexLeftA <- mean(rdsLeft / sqrt(I))
