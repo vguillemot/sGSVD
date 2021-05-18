@@ -14,7 +14,7 @@
 #' res.svd <- svd(X)
 #' res.sgsvd <- sparseGSVD(X, k = 2L)
 #' sparseIndex(res.sgsvd, res.svd$d)
-sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e-16) {
+sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e-10) {
   R <- length(res.sgsvd$d)
   U <- res.sgsvd$U
   V <- res.sgsvd$V
@@ -126,8 +126,8 @@ compute.fit <- function(d, pseudo.d, J, correction = "gsvd") {
   if (correction == "mca"){
     lambda <- (J/(J-1)*(d^2-(1/J)))^2
     pseudo.lambda <- (J/(J-1)*(pseudo.d^2-(1/J)))^2
-    lambda[lambda < (1/J)] = 0
-    pseudo.lambda[pseudo.lambda < (1/J)] = 0
+    lambda[lambda < (1/J)] <- 0
+    # pseudo.lambda[pseudo.lambda < (1/J)] = 0
     r1 <- sum(pseudo.lambda)/sum(lambda)
   }else if (correction == "mfa"){
     stop("MFA correction is not available yet.")
