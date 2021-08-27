@@ -16,18 +16,19 @@
 #' sparseIndex(res.sgsvd, res.svd$d)
 sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e-10) {
   R <- length(res.sgsvd$d)
+  singularValues <- singularValues[1:R]
   U <- res.sgsvd$U
   V <- res.sgsvd$V
   U.sq <- U^2
   V.sq <- V^2
-  if (is.null(res.sgsvd$grpLeft)){
+  if (is.null(res.sgsvd$grpLeft)) {
     ctrLeft <- U.sq
-  }else{
+  } else {
     ctrLeft <- apply(U.sq, 2, function(x) tapply(x, res.sgsvd$grpLeft, FUN = sum))
   }
-  if (is.null(res.sgsvd$grpRight)){
+  if (is.null(res.sgsvd$grpRight)) {
     ctrRight <- V.sq
-  }else{
+  } else {
     ctrRight <- apply(V.sq, 2, function(x) tapply(x, res.sgsvd$grpRight, FUN = sum))
   }
   I <- NROW(ctrLeft)
@@ -38,52 +39,28 @@ sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e
   # Compute the fit part of the index
   # d0 <- singularValues[1:R]
   # dsparse <- res.sgsvd$d
-  # r1 <- sum(dsparse^2) / sum(d0^2)
+  # r1 <- cumsum(dsparse^2) / cumsum(d0^2)
   r1 <- compute.fit(singularValues, res.sgsvd$d, J, correction = correction)
 
   # Compute the sparsity part of the index
 
-  n0inU <- sum(ctrLeft <= tol)
-  n0inV <- sum(ctrRight <= tol)
-  radiusIndexLeftG <- gmean(rdsLeft / sqrt(I))
-  radiusIndexRightG <- gmean(rdsRight / sqrt(J))
-  radiusIndexLeftA <- mean(rdsLeft / sqrt(I))
-  radiusIndexRightA <- mean(rdsRight / sqrt(J))
+  n0inU <- cumsum(colSums(ctrLeft <= tol))
+  n0inV <- cumsum(colSums(ctrRight <= tol))
+  radiusIndexLeftG <- cumgmean(rdsLeft / sqrt(I))
+  radiusIndexRightG <- cumgmean(rdsRight / sqrt(J))
+  radiusIndexLeftA <- cummean(rdsLeft / sqrt(I))
+  radiusIndexRightA <- cummean(rdsRight / sqrt(J))
 
-  r2 <- n0inU / (I * R)
-  r3 <- n0inV / (J * R)
-  r4 <- (n0inU + n0inV) / ((I + J) * R)
+  r2 <- n0inU / (I * (1:R))
+  r3 <- n0inV / (J * (1:R))
+  r4 <- (n0inU + n0inV) / ((I + J) * (1:R))
   # Combine
-  SI1 <- gmean(c(r1, mean(c(r2, r3))))
-  SI1left <- gmean(c(r1, r2))
-  SI1right <- gmean(c(r1, r3))
-  SI2 <- gmean(c(r1, r4))
-  SI2left <- gmean(c(r1, r2))
-  SI2right <- gmean(c(r1, r3))
-  SI3 <- r1 * mean(c(r2, r3))
-  SI3left <- r1 * r2
-  SI3right <- r1 * r3
-  SI4 <- r1 * r4
-  SI4left <- r1 * r2
-  SI4right <- r1 * r3
-  SI5 <- gmean(c(r1, 1 - radiusIndexLeftG, 1 -  radiusIndexRightG))
-  SI5left <- gmean(c(r1, 1 - radiusIndexLeftG))
-  SI5right <- gmean(c(r1, 1 -  radiusIndexRightG))
-  SI6 <- prod(c(r1, 1 - radiusIndexLeftG, 1 - radiusIndexRightG))
-  SI6left <- prod(c(r1, 1 - radiusIndexLeftG))
-  SI6right <- prod(c(r1, 1 - radiusIndexRightG))
-  SI7 <- mean(c(r1, 1 - radiusIndexLeftA, 1 - radiusIndexRightA))
-  SI7left <- mean(c(r1, 1 - radiusIndexLeftA))
-  SI7right <- mean(c(r1, 1 - radiusIndexRightA))
+  SI <- r1 * r4
+  SIleft <- r1 * r2
+  SIright <- r1 * r3
 
   return(list(
-    SI1 = SI1, SI1left = SI1left, SI1right = SI1right,
-    SI2 = SI2, SI2left = SI2left, SI2right = SI2right,
-    SI3 = SI3, SI3left = SI3left, SI3right = SI3right,
-    SI4 = SI4, SI4left = SI4left, SI4right = SI4right,
-    SI5 = SI5, SI5left = SI5left, SI5right = SI5right,
-    SI6 = SI6, SI6left = SI6left, SI6right = SI6right,
-    SI7 = SI7, SI7left = SI7left, SI7right = SI7right,
+    SI = SI, SIleft = SIleft, SIright = SIright,
     r1 = r1, r2 = r2, r3 = r3, r4 = r4,
     n0inU = n0inU, n0inV = n0inV,
     rdsLeft = rdsLeft, rdsRight = rdsRight,
@@ -123,16 +100,46 @@ gmean <- function(x, na.rm = TRUE) {
 #' @examples
 #'
 compute.fit <- function(d, pseudo.d, J, correction = "gsvd") {
-  if (correction == "mca"){
-    lambda <- (J/(J-1)*(d^2-(1/J)))^2
-    pseudo.lambda <- (J/(J-1)*(pseudo.d^2-(1/J)))^2
-    lambda[lambda < (1/J)] <- 0
+  if (correction == "mca") {
+    lambda <- (J / (J - 1) * (d ^ 2 - (1 / J))) ^ 2
+    pseudo.lambda <- (J / (J - 1) * (pseudo.d ^ 2 - (1 / J))) ^ 2
+    lambda[lambda < (1 / J)] <- 0
     # pseudo.lambda[pseudo.lambda < (1/J)] = 0
-    r1 <- sum(pseudo.lambda)/sum(lambda)
-  }else if (correction == "mfa"){
+    r1 <- cumsum(pseudo.lambda) / cumsum(lambda)
+  } else if (correction == "mfa") {
     stop("MFA correction is not available yet.")
-  }else{
-    r1 <- sum(pseudo.d^2) / sum(d^2)
+  } else {
+    r1 <- cumsum(pseudo.d ^ 2) / cumsum(d ^ 2)
   }
   return(r1)
 }
+
+#' Cumulative arithmetic mean
+#'
+#' @param x a vector of numeric values
+#'
+#' @return the cumulative arithmetic mean
+#' @export
+#'
+#' @examples
+cummean <- function(x, na.rm = FALSE) {
+  if (na.rm) x <- na.omit(x)
+  return(cumsum(x) / seq_along(x))
+}
+
+#' Cumulative geometric mean
+#'
+#' @param x vector of positive values
+#' @param na.rm should missing values be removed (default to TRUE)
+#'
+#' @return the cumulative geometric mean of x
+#' @export
+#'
+#' @examples
+#' gmean(c(0.5, 0.5))
+cumgmean <- function(x, na.rm = TRUE) {
+  if (any(abs(x) < 2*.Machine$double.eps)) return(0)
+  if (any(x < 0)) return(0)
+  exp(cummean(log(x), na.rm = na.rm))
+}
+

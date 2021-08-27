@@ -4,12 +4,14 @@
 \alias{sparseIndex}
 \title{Compute sparse indices on the results of a sparse GSVD}
 \usage{
-sparseIndex(res.sgsvd, singularValues, tol = 1e-16)
+sparseIndex(res.sgsvd, singularValues, correction = "gsvd", tol = 1e-10)
 }
 \arguments{
 \item{res.sgsvd}{The result of a sparse Generalized Singular Value Decomposition of a data-matrix, usually obtained with sGSVD::sparseGSVD or one of the companion functions in the SPAFAC package ;}
 
 \item{singularValues}{The singular values of the original data matrix (used to compute the fit of the sparse analysis)}
+
+\item{correction}{The type of correction for proportion of explained variance (r1), e.g., "gsvd" (no correction), "mca", "mfa"}
 
 \item{tol}{a tolerance parameter indicating when a small value should be considered equal to 0}
 }

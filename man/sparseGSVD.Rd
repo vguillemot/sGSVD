@@ -27,6 +27,7 @@ sparseGSVD(
   projPriority = "orth",
   projPriorityLeft = projPriority,
   projPriorityRight = projPriority,
+  correction4SI = "gsvd",
   itermaxALS = 1000,
   itermaxPOCS = 1000,
   epsALS = 1e-10,
@@ -75,6 +76,8 @@ $L_1$ ball for each left vector, Default: rep(1, k)}
 \item{projPriorityLeft}{PARAM_DESCRIPTION, Default: projPriority}
 
 \item{projPriorityRight}{PARAM_DESCRIPTION, Default: projPriority}
+
+\item{correction4SI}{Correction for the explained variance for sparsity indices, e.g., "gsvd" (no correction), "mca" (Benzecri correction of MCA), or "mfa"}
 
 \item{itermaxALS}{The maximum number of ALS iterations, Default: 1000}
 

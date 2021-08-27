@@ -6,10 +6,10 @@
 \usage{
 sparseEIGEN(
   X,
-  R = 2L,
+  k = 2L,
   init = NULL,
   seed = NULL,
-  rds = rep(1, R),
+  rds = rep(1, k),
   grp = NULL,
   orthogonality = "loadings",
   OrthSpace = NULL,
@@ -23,7 +23,7 @@ sparseEIGEN(
 \arguments{
 \item{X}{a symmetric square (data) matrix;}
 
-\item{R}{the desired rank of the singular decomposition;}
+\item{k}{the desired rank of the singular decomposition;}
 
 \item{init}{How to initialize the algorithm}
 
