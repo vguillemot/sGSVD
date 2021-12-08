@@ -7,10 +7,19 @@
 #'
 #' @param X a square, semi-positive symmetric data matrix to decompose
 #' @param W \bold{W}eights -- the constraints applied to the matrix and thus the eigen vectors.
-#' @param c -- the sparsity constraint.
+#' @param R
+#' @param init
+#' @param seed
+#' @param rds
+#' @param grp
+#' @param orthogonality
+#' @param OrthSpace
+#' @param projPriority
+#' @param itermaxALS
+#' @param itermaxPOCS
+#' @param epsALS
+#' @param epsPOCS
 #' @param k total number of components to return though the full variance will still be returned (see \code{d_full}). If 0, the full set of components are returned.
-#' @param tol default is \code{sqrt(.Machine$double.eps)}. A tolerance level for eliminating effectively zero (small variance), negative, imaginary eigen/singular value components.
-#' @param symmetric if \code{X} is symmetric, set as TRUE. See \code{\link{eigen}}.
 #'
 #' @return A list with eight elements:
 #' \item{d_full}{A vector containing the singular values of X above the tolerance threshold (based on eigenvalues).}
@@ -148,19 +157,19 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
   }
   # sparsity parameter
 
-  if (!is.vector(c)) {
-    warning("c is not a vector, converting it automatically")
-    c <- as.vector(c)
+  if (!is.vector(rds)) {
+    warning("'rds' is not a vector, converting it automatically")
+    rds <- as.vector(rds)
   }
 
-  if (!is.numeric(c)) {
-    stop("c must be a numeric vector")
+  if (!is.numeric(rds)) {
+    stop("rds must be a numeric vector")
   }
 
-  if (length(c) != k) {
-    warning("c is not length k, converting")
-    if (length(x) == 1) c <- rep(c, k)
-    else stop("c could not be converted automatically to the correct format")
+  if (length(rds) != k) {
+    warning("rds is not length k, converting")
+    if (length(x) == 1) rds <- rep(rds, k)
+    else stop("rds could not be converted automatically to the correct format")
   }
 
   # all the decomposition things
@@ -168,9 +177,9 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
     k <- min(X_dimensions)
   }
 
-  if (missing(symmetric)) {
-    symmetric <- isSymmetric(X)
-  }
+  # if (missing(symmetric)) {
+  #   symmetric <- isSymmetric(X)
+  # }
 
   res <- sparseEIGEN(X, R = R,
                      init = init, seed = seed,
