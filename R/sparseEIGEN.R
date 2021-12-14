@@ -93,7 +93,7 @@ runTestsEIGEN <- function(X, k, init, seed,
   if (nrow(X) != ncol(X))
     stop("X should be a square matrix.")
 
-  if (!isSymmetric(X))
+  if (!isSymmetric(unname(X)))
     stop("X should be symmetric.")
 
   if (any(is.na(X)))
