@@ -105,10 +105,19 @@ runTestsEIGEN <- function(X, k, init, seed,
 
   ##### Test initialization ####
   if (is.null(init)) {
-    stop("init should be either svd or rand.")
+    stop("init should be either svd or rand or a matrix.")
   }
-  if (! init %in% c("svd", "rand"))
-    stop("init should be either svd or rand.")
+
+  if (is.character(init)) {
+    if (!init %in% c("svd", "rand"))
+      stop("init should be either svd or rand.")
+  }
+
+  if (is.matrix(init)) {
+    if (any(dim(init) != c(nrow(X), k))) {
+      stop("Wrong dimensions for initalization matrix!")
+    }
+  }
 
   return(NULL)
 }
@@ -117,14 +126,18 @@ initializeEIGEN <- function(X, I, k, init, seed = NULL) {
 
   if (!is.null(seed)) set.seed(seed)
 
-  if (init == "svd") {
-    svdx <- svd(X, nu=k, nv=k)
-    U0 <- svdx$u
-  } else if (init == "rand") {
-    U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
-                            Sigma = diag(k), empirical = TRUE)
+  if (is.character(init)) {
+    if (init == "svd") {
+      svdx <- svd(X, nu=k, nv=k)
+      U0 <- svdx$u
+    } else if (init == "rand") {
+      U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
+                              Sigma = diag(k), empirical = TRUE)
+    }
+  } else if (is.matrix(init)) {
+    U0 <- init
   } else {
-    stop("Unkown error, please contact support!")
+    stop("Wrong initialization parameters.")
   }
 
   return(list(U0 = U0))
