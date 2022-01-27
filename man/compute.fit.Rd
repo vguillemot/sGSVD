@@ -2,9 +2,12 @@
 % Please edit documentation in R/sparseIndex.R
 \name{compute.fit}
 \alias{compute.fit}
+\alias{compute.fit.eigen}
 \title{Compute r1 (the explained variance) for sparsity indices}
 \usage{
 compute.fit(d, pseudo.d, J, correction = "gsvd")
+
+compute.fit.eigen(ev, pseudo.ev, I, correction = "gevd")
 }
 \arguments{
 \item{d}{a vector of singular values}

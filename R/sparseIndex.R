@@ -70,6 +70,37 @@ sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e
     radiusIndexRightA = radiusIndexRightA))
 }
 
+#' @rdname sparseIndex
+#' @export
+
+sparseIndexEigen <- function(res.sgevd, eigenValues, correction = "gevd", tol = 1e-10) {
+  R <- length(res.sgevd$values)
+  eigenValues <- eigenValues[1:R]
+  U <- res.sgevd$vectors
+  U.sq <- U^2
+  if (is.null(res.sgevd$grp)) {
+    ctr <- U.sq
+  } else {
+    ctr <- apply(U.sq, 2, function(x) tapply(x, res.sgevd$grp, FUN = sum))
+  }
+
+  I <- NROW(ctr)
+  rds <- res.sgevd$rds
+
+  # Compute the fit part of the index
+  fitRatio <- compute.fit.eigen(eigenValues, res.sgevd$values, I, correction = correction)
+  # Compute the sparsity part of the index
+  n0 <- cumsum(colSums(ctrLeft <= tol))
+  zeroRatio <- n0 / (I * (1:R))
+  # Combine
+  SI <- fitRatio * zeroRatio
+
+  return(list(
+    SI = SI,
+    fitRatio = fitRatio,
+    zeroRatio = zeroRatio,
+    n0 = n0))
+}
 
 #' Geometric mean
 #'
@@ -114,6 +145,19 @@ compute.fit <- function(d, pseudo.d, J, correction = "gsvd") {
   return(r1)
 }
 
+#' @rdname compute.fit
+#' @export
+
+compute.fit.eigen <- function(ev, pseudo.ev, I, correction = "gevd") {
+
+  if (correction != "gevd") {
+    warning("Eigenvalue corrections are not yet supported")
+  }
+
+  r1 <- cumsum(pseudo.ev) / cumsum(ev)
+
+  return(r1)
+}
 #' Cumulative arithmetic mean
 #'
 #' @param x a vector of numeric values

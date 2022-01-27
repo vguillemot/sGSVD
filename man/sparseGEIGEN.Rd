@@ -28,12 +28,6 @@ sparseGEIGEN(
 \item{W}{\bold{W}eights -- the constraints applied to the matrix and thus the eigen vectors.}
 
 \item{k}{total number of components to return though the full variance will still be returned (see \code{d_full}). If 0, the full set of components are returned.}
-
-\item{c}{-- the sparsity constraint.}
-
-\item{tol}{default is \code{sqrt(.Machine$double.eps)}. A tolerance level for eliminating effectively zero (small variance), negative, imaginary eigen/singular value components.}
-
-\item{symmetric}{if \code{X} is symmetric, set as TRUE. See \code{\link{eigen}}.}
 }
 \value{
 A list with eight elements:

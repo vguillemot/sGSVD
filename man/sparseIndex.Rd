@@ -2,9 +2,12 @@
 % Please edit documentation in R/sparseIndex.R
 \name{sparseIndex}
 \alias{sparseIndex}
+\alias{sparseIndexEigen}
 \title{Compute sparse indices on the results of a sparse GSVD}
 \usage{
 sparseIndex(res.sgsvd, singularValues, correction = "gsvd", tol = 1e-10)
+
+sparseIndexEigen(res.sgevd, eigenValues, correction = "gevd", tol = 1e-10)
 }
 \arguments{
 \item{res.sgsvd}{The result of a sparse Generalized Singular Value Decomposition of a data-matrix, usually obtained with sGSVD::sparseGSVD or one of the companion functions in the SPAFAC package ;}

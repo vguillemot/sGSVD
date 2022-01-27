@@ -275,6 +275,15 @@ projOrth <- function(vec, OrthSpace) {
 #' @rdname proj
 #' @export
 
+projPos <- function(x) {
+  res <- pmax(x, 0)
+  return(list(x = res, lambda = NA, k = NaN))
+}
+
+
+#' @rdname proj
+#' @export
+
 projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps) {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
@@ -322,6 +331,33 @@ projOrth_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
     vecold <- vecnew
   }
   res.projLGL2 <- projLGL2(projOrth(vecold, OrthSpace)$x, rds, grp)
+  return(list(x = vecnew, lambda = res.projLGL2$lambda, k = iter))
+}
+
+
+#' @rdname proj
+#' @export
+projOrth_then_projPos_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps)  {
+  vecnew <- vecold <- vec
+  for (iter in 1:itermax) {
+    vecnew <- projL1L2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds)$x
+    if (normL2(vecnew - vecold) < eps) break
+    vecold <- vecnew
+  }
+  res.projL1L2 <- projL1L2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds)
+  return(list(x = vecnew, lambda = res.projL1L2$lambda, k = iter))
+}
+
+#' @rdname proj
+#' @export
+projOrth_then_projPos_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
+  vecnew <- vecold <- vec
+  for (iter in 1:itermax) {
+    vecnew <- projLGL2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds, grp)$x
+    if (normL2(vecnew - vecold) < eps) break
+    vecold <- vecnew
+  }
+  res.projLGL2 <- projLGL2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds, grp)
   return(list(x = vecnew, lambda = res.projLGL2$lambda, k = iter))
 }
 
