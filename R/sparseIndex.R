@@ -90,7 +90,7 @@ sparseIndexEigen <- function(res.sgevd, eigenValues, correction = "gevd", tol = 
   # Compute the fit part of the index
   fitRatio <- compute.fit.eigen(eigenValues, res.sgevd$values, I, correction = correction)
   # Compute the sparsity part of the index
-  n0 <- cumsum(colSums(ctrLeft <= tol))
+  n0 <- cumsum(colSums(ctr <= tol))
   zeroRatio <- n0 / (I * (1:R))
   # Combine
   SI <- fitRatio * zeroRatio
