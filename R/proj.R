@@ -107,9 +107,16 @@ projL1L2 <- function(vec, rds) {
     aksq <- a_k ^ 2
     s_low_1 <- sum(p_low) + nb_a_k * a_k
     s_low_2 <- ssq(p_low) + nb_a_k * aksq
+    if (s_2 + s_low_2 - 2 * a_k * (s_1 + s_low_1) + k * aksq <= 1e-20) {print("help, i'm stuck !") ; next}
     psi_a_k <- (s_1 + s_low_1 - k * a_k) /
       sqrt(s_2 + s_low_2 - 2 * a_k * (s_1 + s_low_1) + k * aksq)
+    ## Minor tweak: put an abs
+    # psi_a_k <- (s_1 + s_low_1 - k * a_k) /
+    #   sqrt(abs(s_2 + s_low_2 - 2 * a_k * (s_1 + s_low_1) + k * aksq))
+    print(s_2 + s_low_2 - 2 * a_k * (s_1 + s_low_1) + k * aksq)
     #Choose partition depending on the constraint
+    print(psi_a_k)
+    print(rds)
     if (psi_a_k > rds) {
       if (length(p_low) == 0)
         break
