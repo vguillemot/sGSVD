@@ -40,7 +40,7 @@ projL1 <- function(vec, rds) {
 #' @rdname proj
 #' @export
 
-projL2 <- function(vec, rds) {
+projL2 <- function(vec, rds = 1) {
   norm2x <- normL2(vec)
   if (norm2x < .Machine$double.eps) return(0*vec)
   res <- vec / norm2x
@@ -50,7 +50,16 @@ projL2 <- function(vec, rds) {
 #' @rdname proj
 #' @export
 
-projL1L2 <- function(vec, rds) {
+projL1L2 <- function(vec, rds, method = "regular") {
+  if (method == "fast") {
+    res <- projL1L2fast(vec, rds)
+  } else {
+    res <- projL1L2regular(vec, rds)
+  }
+  return(res)
+}
+
+projL1L2fast <- function(vec, rds) {
   norm2_x <- normL2(vec)
   if (norm2_x < .Machine$double.eps) {
     warning("Projecting a vector with a very small L2-norm!")
@@ -113,10 +122,10 @@ projL1L2 <- function(vec, rds) {
     ## Minor tweak: put an abs
     # psi_a_k <- (s_1 + s_low_1 - k * a_k) /
     #   sqrt(abs(s_2 + s_low_2 - 2 * a_k * (s_1 + s_low_1) + k * aksq))
-    print(s_2 + s_low_2 - 2 * a_k * (s_1 + s_low_1) + k * aksq)
+    # print(s_2 + s_low_2 - 2 * a_k * (s_1 + s_low_1) + k * aksq)
     #Choose partition depending on the constraint
-    print(psi_a_k)
-    print(rds)
+    # print(psi_a_k)
+    # print(rds)
     if (psi_a_k > rds) {
       if (length(p_low) == 0)
         break
@@ -150,6 +159,72 @@ projL1L2 <- function(vec, rds) {
   ))
 }
 
+projL1L2regular <- function(vec, rds) {
+  norm2_x <- normL2(vec)
+  if (norm2_x < .Machine$double.eps) {
+    warning("Projecting a vector with a very small L2-norm!")
+    return(list(x = 0 * vec, lambda = NA, k = NaN))
+  }
+  if (sum(abs(vec / norm2_x)) <= rds)
+    return(list(
+      x = vec / norm2_x,
+      lambda = max(abs(vec)),
+      k = NaN
+    ))
+  uneq <- vec != 0
+  L <- sum(!uneq)
+  p <- abs(vec[uneq])
+  # Check if multiple maximum
+  MAX <- max(p)
+  bMAX <- p == MAX
+  nMAX <- sum(bMAX)
+  if (rds < sqrt(nMAX)) {
+    warning("Minimum radius is: ", sqrt(nMAX))
+    x_soft        <- rep(0, length(vec))
+    x_soft[abs(vec) == MAX]  <- 1 / sqrt(nMAX)
+    return(list(x = x_soft, lambda = MAX, k = NaN))
+  } else if (rds == sqrt(nMAX)) {
+    warning("radius is equal to sqrt(nMAX)")
+    x_soft        <- rep(0, length(vec))
+    x_soft[abs(vec) == MAX]  <- 1 / sqrt(nMAX)
+    # x_soft[bMAX]  <- 1 / sqrt(nMAX)
+    return(list(x = x_soft, lambda = MAX, k = NaN))
+  }
+  # 1. Take the absolute value of $\x$
+  #   and sort its elements in decreasing order
+  # to get $\widetilde{\x}$\;
+  xtilde <- sort(abs(vec), decreasing = TRUE)
+  psi_xtilde <- psi(xtilde, xtilde)
+  # 2. Find i such that
+  # $\psi(\widetilde{x}_{i+1})\leq c<\psi(\widetilde x_{i})$\;
+  i <- max(which(psi_xtilde <= rds))
+  # 3. Let $\displaystyle \delta = \frac{\normTwo{S(\widetilde{\x}	,
+  #                                                 \widetilde x_i)}}{i}\left( c\sqrt{\frac{i-\psi(\widetilde x_i)^2}{i-c^2}}
+  #                                                                            - \psi(\widetilde x_i)\right)$\;
+  t1 <- normL2(proxL1(xtilde, xtilde[i])) / i
+  t2 <- (i - psi_xtilde[i]^2) / (i - rds^2)
+  t3 <- psi_xtilde[i]
+  delta <- t1 * (rds * sqrt(t2) - t3)
+  # 4. Compute $S(\x, \lambda)$ with $\lambda = \widetilde x_i - \delta$
+  lambda <- xtilde[i] - delta
+  x_soft <- sign(vec) * pmax(0, abs(vec) - lambda)
+  return(list(
+    x = x_soft / normL2(x_soft) ,
+    lambda = lambda,
+    k = NaN
+  ))
+}
+
+phi <- Vectorize(function(x, lambda) {
+  return(normL1(proxL1(vec = x, lambda = lambda)))
+}, vectorize.args = "lambda")
+
+psi <- Vectorize(function(x, lambda) {
+  x_soft <- proxL1(vec = x, lambda = lambda)
+  return(normL1(x_soft) / normL2(x_soft))
+}, vectorize.args = "lambda")
+
+
 #' @rdname proj
 #' @export
 
@@ -166,7 +241,16 @@ projLG <- function(vec, rds, grp) {
 #' @rdname proj
 #' @export
 
-projLGL2 <- function(vec, rds, grp) {
+projLGL2 <- function(vec, rds, grp, method = "fast") {
+  if (method == "fast") {
+    res <- projLGL2fast(vec, rds, grp)
+  } else {
+    res <- projLGL2regular(vec, rds, grp)
+  }
+  return(res)
+}
+
+projLGL2fast <- function(vec, rds, grp) {
   grpvec <- tapply(vec, grp, normL2)
   norm2_x <- normL2(grpvec)
   if (norm2_x < .Machine$double.eps) {
@@ -261,6 +345,52 @@ projLGL2 <- function(vec, rds, grp) {
     k = NaN
   ))
 }
+
+
+projLGL2regular <- function(vec, rds, grp) {
+  grpvec <- tapply(vec, grp, normL2)
+  norm2_x <- normL2(grpvec)
+  if (norm2_x < .Machine$double.eps) {
+    warning("Projecting a vector with a very small L2-norm!")
+    return(list(x = 0 * vec, lambda = NA, k = NaN))
+  }
+  if (normLG(projL2(vec)$x, grp) <= rds)
+    return(list(
+      x = projL2(vec)$x,
+      lambda = max(abs(grpvec)),
+      k = NaN
+    ))
+  uneq <- grpvec != 0
+  L <- sum(!uneq)
+  p <- abs(grpvec[uneq])
+  # Check if multiple maximum
+  MAX <- max(p)
+  bMAX <- p == MAX
+  nMAX <- sum(bMAX)
+  if (rds < sqrt(nMAX)) {
+    warning("Minimum radius is: ", sqrt(nMAX))
+    x_soft        <- rep(0, length(vec))
+    x_soft[abs(vec) == MAX]  <- 1 / sqrt(nMAX)
+    return(list(x = x_soft, lambda = MAX, k = NaN))
+  } else if (rds == sqrt(nMAX)) {
+    warning("radius is equal to sqrt(nMAX)")
+    projvec <- rep(0, length(vec))
+    for (g in unique(grp)[bMAX]) {
+      ig <- grp == g
+      projvec[ig] <- projL2(vec[ig])$x
+    }
+    return(list(x = projL2(projvec)$x, lambda = MAX, k = NaN))
+  }
+  # Compute lambda with projL1L2regular
+  lambda <- projL1L2regular(grpvec, rds)$lambda
+  projvec <- projL2(proxLG(vec, lambda, grp))$x
+  return(list(
+    x = projvec,
+    lambda = lambda,
+    k = NaN
+  ))
+}
+
 
 #' @rdname proj
 #' @export
