@@ -241,7 +241,7 @@ projLG <- function(vec, rds, grp) {
 #' @rdname proj
 #' @export
 
-projLGL2 <- function(vec, rds, grp, method = "fast") {
+projLGL2 <- function(vec, rds, grp, method = "regular") {
   if (method == "fast") {
     res <- projLGL2fast(vec, rds, grp)
   } else {
