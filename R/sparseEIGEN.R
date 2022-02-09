@@ -27,8 +27,11 @@ sparseEIGEN <- function(X, k = 2L,
                  orthogonality = "loadings",
                  OrthSpace = NULL,
                  projPriority = "orth",
+                 compute_sparsity_index = TRUE,
+                 correction4SI = "gevd",
                  itermaxALS = 1000, itermaxPOCS = 1000,
-                 epsALS = 1e-10, epsPOCS = 1e-10) {
+                 epsALS = 1e-10, epsPOCS = 1e-10,
+                 tol.si = .Machine$double.eps) {
 
   # Test that the arguments are valid
   garb <- runTestsEIGEN(X, k, init, seed,
@@ -78,6 +81,20 @@ sparseEIGEN <- function(X, k = 2L,
 
   oD <- order(lambda, decreasing = TRUE)
   res <- list(values = lambda[oD], vectors = U[, oD], iter = iter)
+
+  # Compute Sparsity Index
+  res$rds <- rds
+  res$grp <- grp
+
+  if (compute_sparsity_index) {
+    res.SI <- sparseIndexEigen(
+      res.sgevd = res,
+      eigenValues = eigen(X, only.values = TRUE)$values,
+      correction = correction4SI,
+      tol = tol.si)
+    res$SI <- res.SI
+  }
+
   return(res)
 }
 

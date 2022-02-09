@@ -57,7 +57,8 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
                        projPriorityRight = projPriority,
                        correction4SI = "gsvd",
                        itermaxALS = 1000, itermaxPOCS = 1000,
-                       epsALS = 1e-10, epsPOCS = 1e-10, tol.si = .Machine$double.eps){
+                       epsALS = 1e-10, epsPOCS = 1e-10,
+                       tol.si = .Machine$double.eps){
 
   # preliminaries
   Y_is_missing <- missing(Y)
@@ -384,7 +385,8 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
                    projPriorityLeft = projPriorityLeft,
                    projPriorityRight = projPriorityRight,
                    itermaxALS = itermaxALS, itermaxPOCS = itermaxPOCS,
-                   epsALS = epsALS, epsPOCS = epsPOCS)
+                   epsALS = epsALS, epsPOCS = epsPOCS,
+                   compute_sparsity_index = FALSE)
 
   res$d_full <- res$d
   res$l_full <- res$d_full^2
@@ -412,7 +414,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
       res$fi <- t(t(LW %*% res$p) * res$d)
 
     }
-  }else{
+  } else {
 
     res$p <- res$U
     # res$fi <- sweep(res$p,2,res$d,"*")
@@ -450,7 +452,7 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
     rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- colnames(X)
     rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(Y)
   }
-  # Compute the Sparse Index
+  # Compute Sparsity Index
   res$rdsLeft <- rdsLeft
   res$rdsRight <- rdsRight
   res$grpLeft <- grpLeft

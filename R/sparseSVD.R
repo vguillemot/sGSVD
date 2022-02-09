@@ -40,8 +40,11 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
                  projPriority = "orth",
                  projPriorityLeft = projPriority,
                  projPriorityRight = projPriority,
+                 compute_sparsity_index = TRUE,
+                 correction4SI = "gsvd",
                  itermaxALS = 1000, itermaxPOCS = 1000,
-                 epsALS = 1e-10, epsPOCS = 1e-10) {
+                 epsALS = 1e-10, epsPOCS = 1e-10,
+                 tol.si = .Machine$double.eps) {
 
   if (is.null(Y)) {
     Data <- X
@@ -152,6 +155,21 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
   oD <- order(d, decreasing = TRUE)
   # oD <- 1:R
   res <- list(d = d[oD], U = U[, oD], V = V[, oD], iter = iter)
+
+  res$rdsLeft <- rdsLeft
+  res$rdsRight <- rdsRight
+  res$grpLeft <- grpLeft
+  res$grpRight <- grpRight
+
+  # Compute the Sparsity Index
+  if (compute_sparsity_index) {
+    res.SI <- sparseIndex(
+        res.sgsvd = res,
+        singularValues = svd(X, 0, 0)$d,
+        correction = correction4SI,
+        tol = tol.si)
+    res$SI <- res.SI
+  }
 
   return(res)
 }

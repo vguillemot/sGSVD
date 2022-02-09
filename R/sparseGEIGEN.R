@@ -60,8 +60,10 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
                           orthogonality = "loadings",
                           OrthSpace = NULL,
                           projPriority = "orth",
+                          correction4SI = "gevd",
                           itermaxALS = 1000, itermaxPOCS = 1000,
-                          epsALS = 1e-10, epsPOCS = 1e-10){
+                          epsALS = 1e-10, epsPOCS = 1e-10,
+                          tol.si = .Machine$double.eps){
 
   # preliminaries
   X_dimensions <- dim(X)
@@ -188,8 +190,11 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
                      orthogonality = orthogonality,
                      OrthSpace = OrthSpace,
                      projPriority = projPriority,
+                     compute_sparsity_index = FALSE,
+                     correction4SI = correction4SI,
                      itermaxALS = itermaxALS, itermaxPOCS = itermaxPOCS,
-                     epsALS = epsALS, epsPOCS = epsPOCS)
+                     epsALS = epsALS, epsPOCS = epsPOCS,
+                     tol.si = tol.si)
 
   res$l_full <- res$values
     res$values <- NULL
@@ -233,7 +238,7 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
   # Compute Sparsity Index
   res$rds <- rds
   res$grp <- grp
-  res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values)
+  res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values, correction = correction4SI, tol = tol.si)
   res$SI <- res.SI
 
   class(res) <- c("sparse_geigen", "GSVD", "list")
