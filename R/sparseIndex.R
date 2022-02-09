@@ -17,8 +17,8 @@
 sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e-10) {
   R <- length(res.sgsvd$d)
   singularValues <- singularValues[1:R]
-  U <- res.sgsvd$U
-  V <- res.sgsvd$V
+  U <- res.sgsvd$u
+  V <- res.sgsvd$v
   U.sq <- U^2
   V.sq <- V^2
   if (is.null(res.sgsvd$grpLeft)) {
@@ -100,7 +100,7 @@ sparseIndexEigen <- function(res.sgevd, eigenValues, correction = "gevd", tol = 
     fitRatio = fitRatio,
     zeroRatio = zeroRatio,
     n0 = n0,
-    r1 = fitRatio, r2 = NA, r3 = NA, r4 = zeroRatio, rds = rds))
+    r1 = fitRatio, r4 = zeroRatio, rds = rds))
 }
 
 #' Geometric mean

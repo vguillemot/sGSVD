@@ -7,7 +7,7 @@
 #'
 #' @param X a square, semi-positive symmetric data matrix to decompose
 #' @param W \bold{W}eights -- the constraints applied to the matrix and thus the eigen vectors.
-#' @param R
+#' @param k
 #' @param init
 #' @param seed
 #' @param rds
@@ -53,9 +53,9 @@
 #' @author Derek Beaton
 #' @keywords multivariate
 
-sparseGEIGEN <- function(X, W, k = 0, R = 2L,
+sparseGEIGEN <- function(X, W, k = 0,
                           init = NULL, seed = NULL,
-                          rds = rep(1, R),
+                          rds = rep(1, k),
                           grp = NULL,
                           orthogonality = "loadings",
                           OrthSpace = NULL,
@@ -196,15 +196,9 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
                      epsALS = epsALS, epsPOCS = epsPOCS,
                      tol.si = tol.si)
 
-  # Compute Sparsity Index
-  res$rds <- rds
-  res$grp <- grp
-  print(res)
-  res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values, correction = correction4SI, tol = tol.si)
-  res$SI <- res.SI
 
   res$l_full <- res$values
-    res$values <- NULL
+    # res$values <- NULL
   res$d_full <- sqrt(res$l_full)
   # res$tau <- (res$l_full/sum(res$l_full)) * 100
 
@@ -212,9 +206,15 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
 
   res$d <- res$d_full[1:components_to_return]
   res$l <- res$l_full[1:components_to_return]
-  res$v <- res$vectors[,1:components_to_return, drop = FALSE]
-    res$vectors <- NULL
+  res$u <- res$vectors[,1:components_to_return, drop = FALSE]
+    # res$vectors <- NULL
 
+  # Compute Sparsity Index
+  res$rds <- rds
+  res$grp <- grp
+  # print(res)
+  res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values, correction = correction4SI, tol = tol.si)
+  res$SI <- res.SI
 
 
 
@@ -222,24 +222,24 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
   if(!W_is_missing){
     if(W_is_vector){
 
-      res$q <- res$v / sqrt_W
-      res$fj <- t(t(res$q * W) * res$d)
+      res$p <- res$u / sqrt_W
+      res$f <- t(t(res$p * W) * res$d)
 
     }else{
 
-      # res$q <- (W %^% (-1/2)) %*% res$v
-      res$q <- invsqrt_psd_matrix(W) %*% res$v
-      res$fj <- t(t(W %*% res$q) * res$d)
+      # res$p <- (W %^% (-1/2)) %*% res$u
+      res$p <- invsqrt_psd_matrix(W) %*% res$u
+      res$f <- t(t(W %*% res$p) * res$d)
 
     }
   }else{
 
-    res$q <- res$v
-    res$fj <- t(t(res$q) * res$d)
+    res$p <- res$u
+    res$f <- t(t(res$p) * res$d)
 
   }
 
-  rownames(res$fj) <- rownames(res$v) <- rownames(res$q) <- colnames(X)
+  rownames(res$f) <- rownames(res$u) <- rownames(res$p) <- colnames(X)
 
 
   class(res) <- c("sparse_geigen", "GSVD", "list")

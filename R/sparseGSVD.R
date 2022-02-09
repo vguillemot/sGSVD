@@ -394,29 +394,29 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
   components.to.return <- min(length(res$d_full), k) # a safety check
   res$d <- res$d_full[1:components.to.return]
   res$l <- res$d^2
-  res$U <- res$U[,1:components.to.return, drop = FALSE]
-  res$V <- res$V[,1:components.to.return, drop = FALSE]
+  res$u <- res$u[,1:components.to.return, drop = FALSE]
+  res$v <- res$v[,1:components.to.return, drop = FALSE]
 
   # make scores according to weights
   if(!LW_is_missing){
     if(LW_is_vector){
 
-      # res$p <- sweep(res$U,1,1/sqrt_LW,"*")
-      res$p <- res$U / sqrt_LW
+      # res$p <- sweep(res$u,1,1/sqrt_LW,"*")
+      res$p <- res$u / sqrt_LW
       # res$fi <- sweep(sweep(res$p,1,LW,"*"),2,res$d,"*")
       res$fi <- t(t(res$p * LW) * res$d)
 
-    }else{
+    } else {
 
-      # res$p <- (LW %^% (-1/2)) %*% res$U
-      res$p <- invsqrt_psd_matrix(LW) %*% res$U
+      # res$p <- (LW %^% (-1/2)) %*% res$u
+      res$p <- invsqrt_psd_matrix(LW) %*% res$u
       # res$fi <- sweep((LW %*% res$p),2,res$d,"*")
       res$fi <- t(t(LW %*% res$p) * res$d)
 
     }
   } else {
 
-    res$p <- res$U
+    res$p <- res$u
     # res$fi <- sweep(res$p,2,res$d,"*")
     res$fi <- t(t(res$p) * res$d)
 
@@ -425,32 +425,32 @@ sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double
   if(!RW_is_missing){
     if(RW_is_vector){
 
-      # res$q <- sweep(res$V,1,1/sqrt_RW,"*")
-      res$q <- res$V / sqrt_RW
+      # res$q <- sweep(res$v,1,1/sqrt_RW,"*")
+      res$q <- res$v / sqrt_RW
       # res$fj <- sweep(sweep(res$q,1,RW,"*"),2,res$d,"*")
       res$fj <- t(t(res$q * RW) * res$d)
 
     }else{
 
-      res$q <- invsqrt_psd_matrix(RW) %*% res$V
+      res$q <- invsqrt_psd_matrix(RW) %*% res$v
       # res$fj <- sweep((RW %*% res$q),2,res$d,"*")
       res$fj <- t(t(RW %*% res$q) * res$d)
 
     }
-  }else{
+  } else {
 
-    res$q <- res$V
+    res$q <- res$v
     # res$fj <- sweep(res$q,2,res$d,"*")
     res$fj <- t(t(res$q)  * res$d)
 
   }
 
   if (is.null(Y)){
-    rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- rownames(X)
-    rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(X)
+    rownames(res$fi) <- rownames(res$u) <- rownames(res$p) <- rownames(X)
+    rownames(res$fj) <- rownames(res$v) <- rownames(res$q) <- colnames(X)
   }else{
-    rownames(res$fi) <- rownames(res$U) <- rownames(res$p) <- colnames(X)
-    rownames(res$fj) <- rownames(res$V) <- rownames(res$q) <- colnames(Y)
+    rownames(res$fi) <- rownames(res$u) <- rownames(res$p) <- colnames(X)
+    rownames(res$fj) <- rownames(res$v) <- rownames(res$q) <- colnames(Y)
   }
   # Compute Sparsity Index
   res$rdsLeft <- rdsLeft
