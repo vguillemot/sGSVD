@@ -229,6 +229,13 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
 
   rownames(res$fj) <- rownames(res$v) <- rownames(res$q) <- colnames(X)
 
+
+  # Compute Sparsity Index
+  res$rds <- rds
+  res$grp <- grp
+  res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values)
+  res$SI <- res.SI
+
   class(res) <- c("sparse_geigen", "GSVD", "list")
   return(res)
 
