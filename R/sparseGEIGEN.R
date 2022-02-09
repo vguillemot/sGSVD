@@ -183,7 +183,7 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
   #   symmetric <- isSymmetric(X)
   # }
 
-  res <- sparseEIGEN(X, R = R,
+  res <- sparseEIGEN(X, k = k,
                      init = init, seed = seed,
                      rds = rds,
                      grp = grp,
@@ -195,6 +195,13 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
                      itermaxALS = itermaxALS, itermaxPOCS = itermaxPOCS,
                      epsALS = epsALS, epsPOCS = epsPOCS,
                      tol.si = tol.si)
+
+  # Compute Sparsity Index
+  res$rds <- rds
+  res$grp <- grp
+  print(res)
+  res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values, correction = correction4SI, tol = tol.si)
+  res$SI <- res.SI
 
   res$l_full <- res$values
     res$values <- NULL
@@ -234,12 +241,6 @@ sparseGEIGEN <- function(X, W, k = 0, R = 2L,
 
   rownames(res$fj) <- rownames(res$v) <- rownames(res$q) <- colnames(X)
 
-
-  # Compute Sparsity Index
-  res$rds <- rds
-  res$grp <- grp
-  res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values, correction = correction4SI, tol = tol.si)
-  res$SI <- res.SI
 
   class(res) <- c("sparse_geigen", "GSVD", "list")
   return(res)
