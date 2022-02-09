@@ -99,7 +99,8 @@ sparseIndexEigen <- function(res.sgevd, eigenValues, correction = "gevd", tol = 
     SI = SI,
     fitRatio = fitRatio,
     zeroRatio = zeroRatio,
-    n0 = n0))
+    n0 = n0,
+    r1 = fitRatio, r2 = NA, r3 = NA, r4 = zeroRatio, rds = rds))
 }
 
 #' Geometric mean
