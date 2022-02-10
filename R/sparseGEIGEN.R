@@ -197,16 +197,7 @@ sparseGEIGEN <- function(X, W, k = 0,
                      tol.si = tol.si)
 
 
-  res$l_full <- res$values
     # res$values <- NULL
-  res$d_full <- sqrt(res$l_full)
-  # res$tau <- (res$l_full/sum(res$l_full)) * 100
-
-  components_to_return <- min(length(res$d_full),k)
-
-  res$d <- res$d_full[1:components_to_return]
-  res$l <- res$l_full[1:components_to_return]
-  res$u <- res$vectors[,1:components_to_return, drop = FALSE]
     # res$vectors <- NULL
 
   # Compute Sparsity Index
@@ -216,7 +207,9 @@ sparseGEIGEN <- function(X, W, k = 0,
   res.SI <- sparseIndexEigen(res.sgevd = res, eigenValues = eigen(X, only.values = TRUE)$values, correction = correction4SI, tol = tol.si)
   res$SI <- res.SI
 
-
+  res$l <- res$values
+  res$d <- sqrt(res$l)
+  res$u <- res$vectors
 
   # make scores according to weights
   if(!W_is_missing){
