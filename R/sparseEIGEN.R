@@ -1,3 +1,5 @@
+
+
 #' Constrained eigen-value decomposition of a symmetric matrix
 #'
 #' @param X a symmetric square (data) matrix;

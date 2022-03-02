@@ -99,7 +99,7 @@ sparseGEIGEN <- function(X, W, k = 0,
     }
 
     if(W_is_vector){
-      if(length(W)!=X_dimensions[1]){
+      if(length(W) != X_dimensions[1]){
         stop("sparse_geigen: length(W) does not equal nrow(X)")
       }
 
@@ -139,7 +139,7 @@ sparseGEIGEN <- function(X, W, k = 0,
       sqrt_W <- sqrt(W)
       X <- t(t(X * sqrt_W) * sqrt_W)
 
-    }else{
+    } else {
 
       W <- as.matrix(W)
       # sqrt_W <- W %^% (1/2)
@@ -170,7 +170,7 @@ sparseGEIGEN <- function(X, W, k = 0,
 
   if (length(rds) != k) {
     warning("rds is not length k, converting")
-    if (length(x) == 1) rds <- rep(rds, k)
+    if (length(rds) == 1) rds <- rep(rds, k)
     else stop("rds could not be converted automatically to the correct format")
   }
 
