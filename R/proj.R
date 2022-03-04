@@ -383,7 +383,7 @@ projLGL2regular <- function(vec, rds, grp) {
   }
   # Compute lambda with projL1L2regular
   lambda <- projL1L2regular(grpvec, rds)$lambda
-  projvec <- projL2(proxLG(vec, lambda, grp))$x
+  projvec <- projL2(proxLG(vec, lambda, grp)$x)$x
   return(list(
     x = projvec,
     lambda = lambda,
