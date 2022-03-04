@@ -357,7 +357,7 @@ projLGL2regular <- function(vec, rds, grp) {
   }
   if (normLG(projL2(vec)$x, grp) <= rds)
     return(list(
-      x <- projL2(vec)$x,
+      x = projL2(vec)$x,
       lambda = max(abs(grpvec)),
       k = NaN
     ))
