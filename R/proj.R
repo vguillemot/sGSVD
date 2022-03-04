@@ -42,7 +42,8 @@ projL1 <- function(vec, rds) {
 
 projL2 <- function(vec, rds = 1) {
   norm2x <- normL2(vec)
-  if (norm2x < .Machine$double.eps) return(0*vec)
+  if (norm2x < .Machine$double.eps)
+    return(list(x = 0*vec, lambda = NA, k = NaN))
   res <- vec / norm2x
   return(list(x = res, lambda = NA, k = NaN))
 }
@@ -356,7 +357,7 @@ projLGL2regular <- function(vec, rds, grp) {
   }
   if (normLG(projL2(vec)$x, grp) <= rds)
     return(list(
-      x = projL2(vec)$x,
+      x <- projL2(vec)$x,
       lambda = max(abs(grpvec)),
       k = NaN
     ))
