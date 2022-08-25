@@ -397,7 +397,8 @@ projLGL2regular <- function(vec, rds, grp) {
 #' @export
 
 projOrth <- function(vec, OrthSpace) {
-  Mtx <- t(OrthSpace) %*% vec
+  # Mtx <- t(OrthSpace) %*% vec -> switch to crossprod
+  Mtx <- crossprod(OrthSpace, vec)
   MMtx <- OrthSpace %*% Mtx
   res <- vec - MMtx
   # If the vector is almost null, then replace
