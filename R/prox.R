@@ -15,6 +15,8 @@
 #' g <- c(1, 1, 2)
 #' proxL1(x, lamb) # = (0, 0.5, 0)
 #' proxL2(x, lamb) # ~= (-0.1, 0.6, 0.3)
+#' proxLG(x, lamb, c(1, 2, 3)) # = (0, 0.5, 0)
+#' proxLG(x, lamb, c(1, 1, 1)) # ~= (-0.1, 0.6, 0.3)
 #' proxLG(x, lamb, g) # ~= (-0.1, 0.5, 0)
 NULL
 #' @rdname prox
