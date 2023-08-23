@@ -100,8 +100,8 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
       grpLeft = grpLeft, grpRight = grpRight,
       OrthSpaceLeft = OrthSpaceLeft,
       OrthSpaceRight = OrthSpaceRight,
-      itermaxALS = 1000, itermaxPOCS = 1000,
-      epsALS = 1e-10, epsPOCS = 1e-10)
+      itermaxALS = itermaxALS, itermaxPOCS = itermaxPOCS,
+      epsALS = epsALS, epsPOCS = epsPOCS)
 
     if (all(res.als$u == 0) | all(res.als$v == 0)) {
       stop ("Too many components are estimated. Try extracting fewer components.")

@@ -22,7 +22,11 @@
 #' @examples
 #'
 
-als <- function(X, initLeft, initRight, projLeft, projRight, rdsLeft, rdsRight, grpLeft = NULL, grpRight = NULL, OrthSpaceLeft, OrthSpaceRight, itermaxALS = 1000, itermaxPOCS = 1000, epsALS = 1e-10, epsPOCS = 1e-10) {
+als <- function(X, initLeft, initRight, projLeft, projRight,
+                rdsLeft, rdsRight, grpLeft = NULL, grpRight = NULL,
+                OrthSpaceLeft, OrthSpaceRight,
+                itermaxALS = 1000, itermaxPOCS = 1000,
+                epsALS = 1e-10, epsPOCS = 1e-10) {
   uold <- unew <- initLeft
   vold <- vnew <- initRight
 
@@ -44,12 +48,17 @@ als <- function(X, initLeft, initRight, projLeft, projRight, rdsLeft, rdsRight, 
   return(list(d = d, u = unew, v = vnew, iterALS = iter, iterTOTAL = iterTOTAL))
 }
 
-powerIteration <- function(X, init, proj, rds, grp = NULL, OrthSpace, itermaxALS = 1000, itermaxPOCS = 1000, epsALS = 1e-10, epsPOCS = 1e-10) {
+powerIteration <- function(
+    X, init, proj, rds, grp = NULL, OrthSpace,
+    itermaxALS = 1000, itermaxPOCS = 1000,
+    epsALS = 1e-10, epsPOCS = 1e-10) {
   uold <- unew <- init
 
   iterTOTAL <- 0
   for (iter in 1:itermaxALS) {
-    res.proj <- proj(vec = X %*% uold, rds = rds, grp = grp, OrthSpace = OrthSpace, itermax = itermaxPOCS, eps = epsPOCS)
+    res.proj <- proj(vec = X %*% uold, rds = rds, grp = grp,
+                     OrthSpace = OrthSpace, itermax = itermaxPOCS,
+                     eps = epsPOCS)
     unew <- res.proj$x
     iterTOTAL <- iterTOTAL + res.proj$k + res.proj$k
     if ( normL2(unew - uold) < epsALS ) break
