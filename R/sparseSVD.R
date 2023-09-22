@@ -151,10 +151,10 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
     d[r] <- res.als$d
 
   }
-
+  print(d)
   oD <- order(d, decreasing = TRUE)
-  # oD <- 1:R
-  res <- list(d = d[oD], u = U[, oD], v = V[, oD], iter = iter)
+  # oD <- 1:k
+  res <- list(d = d[oD], u = U[, oD], v = V[, oD], order = oD, iter = iter)
 
   res$rdsLeft <- rdsLeft
   res$rdsRight <- rdsRight
