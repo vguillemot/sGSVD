@@ -25,12 +25,6 @@ als(
 \arguments{
 \item{X}{data matrix on which the ALS is performed}
 }
-\value{
-
-}
 \description{
 Alternative least squares method helper for the cGSVD
-}
-\examples{
-
 }

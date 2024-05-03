@@ -8,18 +8,19 @@ sparseGEIGEN(
   X,
   W,
   k = 0,
-  R = 2L,
   init = NULL,
   seed = NULL,
-  rds = rep(1, R),
+  rds = rep(1, k),
   grp = NULL,
   orthogonality = "loadings",
   OrthSpace = NULL,
   projPriority = "orth",
+  correction4SI = "gevd",
   itermaxALS = 1000,
   itermaxPOCS = 1000,
   epsALS = 1e-10,
-  epsPOCS = 1e-10
+  epsPOCS = 1e-10,
+  tol.si = .Machine$double.eps
 )
 }
 \arguments{

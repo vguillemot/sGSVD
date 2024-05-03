@@ -24,6 +24,3 @@ the corrected eigenvalues and tau
 \description{
 Compute r1 (the explained variance) for sparsity indices
 }
-\examples{
-
-}

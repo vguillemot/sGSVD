@@ -4,7 +4,10 @@
 #'
 #' @param X a symmetric square (data) matrix;
 #' @param k the desired rank of the singular decomposition;
-#' @param init How to initialize the algorithm
+#' @param init How to initialize the algorithm.
+#' svd (default) = initializes with the SVD,
+#' eig or eigen = initializes with the EVD,
+#' rand = initializes with a random vector.
 #' @param rds The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension;
 #' @param seed
 #' @param grp
@@ -146,8 +149,8 @@ initializeEIGEN <- function(X, I, k, init, seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
 
   if (is.character(init)) {
-    if (init == "svd") {
-      svdx <- svd(X, nu=k, nv=k)
+    if (init == "svd" | init == "eigen" | init == "eig" ) {
+      svdx <- svd(X, nu=k, nv=0)
       U0 <- svdx$u
     } else if (init == "rand") {
       U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
@@ -156,7 +159,7 @@ initializeEIGEN <- function(X, I, k, init, seed = NULL) {
   } else if (is.matrix(init)) {
     U0 <- init
   } else {
-    stop("Wrong initialization parameters.")
+    stop("Wrong initialization parameters. Should be eig, eigen, svd, or rand.")
   }
 
   return(list(U0 = U0))

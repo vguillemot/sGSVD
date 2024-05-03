@@ -14,10 +14,13 @@ sparseEIGEN(
   orthogonality = "loadings",
   OrthSpace = NULL,
   projPriority = "orth",
+  compute_sparsity_index = TRUE,
+  correction4SI = "gevd",
   itermaxALS = 1000,
   itermaxPOCS = 1000,
   epsALS = 1e-10,
-  epsPOCS = 1e-10
+  epsPOCS = 1e-10,
+  tol.si = .Machine$double.eps
 )
 }
 \arguments{
@@ -25,7 +28,10 @@ sparseEIGEN(
 
 \item{k}{the desired rank of the singular decomposition;}
 
-\item{init}{How to initialize the algorithm}
+\item{init}{How to initialize the algorithm.
+svd (default) = initializes with the SVD,
+eig or eigen = initializes with the EVD,
+rand = initializes with a random vector.}
 
 \item{rds}{The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension;}
 

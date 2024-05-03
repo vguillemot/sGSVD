@@ -22,10 +22,13 @@ sparseSVD(
   projPriority = "orth",
   projPriorityLeft = projPriority,
   projPriorityRight = projPriority,
+  compute_sparsity_index = TRUE,
+  correction4SI = "gsvd",
   itermaxALS = 1000,
   itermaxPOCS = 1000,
   epsALS = 1e-10,
-  epsPOCS = 1e-10
+  epsPOCS = 1e-10,
+  tol.si = .Machine$double.eps
 )
 }
 \arguments{
