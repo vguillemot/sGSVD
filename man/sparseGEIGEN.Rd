@@ -7,7 +7,7 @@
 sparseGEIGEN(
   X,
   W,
-  k = 0,
+  k = 2L,
   init = NULL,
   seed = NULL,
   rds = rep(1, k),

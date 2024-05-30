@@ -11,7 +11,7 @@ sparseGSVD(
   RW,
   LM,
   RM,
-  k = 0,
+  k = 2L,
   tol = .Machine$double.eps,
   init = "svd",
   initLeft = NULL,
