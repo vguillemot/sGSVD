@@ -46,8 +46,10 @@
 #' @export
 
 
-sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 0, tol = .Machine$double.eps,
-                       init = "svd", initLeft = NULL, initRight = NULL, seed = NULL,
+sparseGSVD <- function(X, Y = NULL, LW, RW, LM, RM, k = 2L,
+                       tol = .Machine$double.eps,
+                       init = "svd",
+                       initLeft = NULL, initRight = NULL, seed = NULL,
                        rdsLeft = rep(1, k), rdsRight = rep(1, k),
                        grpLeft = NULL, grpRight = NULL,
                        orthogonality = "loadings",

@@ -7,7 +7,7 @@
 #'
 #' @param X a square, semi-positive symmetric data matrix to decompose
 #' @param W \bold{W}eights -- the constraints applied to the matrix and thus the eigen vectors.
-#' @param k
+#' @param k number of dimensions (default to 2)
 #' @param init
 #' @param seed
 #' @param rds
@@ -53,7 +53,7 @@
 #' @author Derek Beaton
 #' @keywords multivariate
 
-sparseGEIGEN <- function(X, W, k = 0,
+sparseGEIGEN <- function(X, W, k = 2L,
                           init = NULL, seed = NULL,
                           rds = rep(1, k),
                           grp = NULL,
