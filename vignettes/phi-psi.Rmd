@@ -1,0 +1,96 @@
+---
+title: "The phi and psi helper functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{The phi and psi helper functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
+)
+```
+
+```{r setup}
+library(sGSVD)
+```
+
+## Why `phi` and `psi`?
+
+`projL1L2regular()` looks for a soft-thresholding parameter `lambda` such
+that the thresholded vector satisfies a target ratio between its L1- and
+L2-norms (the constraint used by the L1L2 projection). Two small internal
+helpers make this search possible:
+
+* `phi(x, lambda)` returns the L1-norm of `x` after soft-thresholding at
+  `lambda`.
+* `psi(x, lambda)` returns the ratio of the L1-norm to the L2-norm of `x`
+  after soft-thresholding at `lambda` -- this ratio is what actually needs
+  to hit the target radius `rds`.
+
+Both functions are internal (not exported), so they are accessed here with
+`sGSVD:::`.
+
+```{r}
+phi <- sGSVD:::phi
+psi <- sGSVD:::psi
+```
+
+## A toy example
+
+```{r}
+set.seed(42)
+x <- rnorm(10)
+lambda_grid <- seq(0, max(abs(x)), length.out = 200)
+```
+
+`phi(x, lambda)` is a decreasing, piecewise-linear function of `lambda`: as
+the threshold increases, more entries of `x` are shrunk towards zero, so the
+L1-norm of the thresholded vector decreases.
+
+```{r}
+plot(lambda_grid, phi(x, lambda_grid), type = "l",
+     xlab = expression(lambda), ylab = expression(phi(x, lambda)),
+     main = "phi: L1-norm of the soft-thresholded vector")
+```
+
+`psi(x, lambda)` is also decreasing in `lambda`, from `sqrt(length(x))`
+(when nothing is thresholded, i.e. `lambda = 0`) down to `1` (when a single
+entry survives thresholding).
+
+```{r}
+plot(lambda_grid, psi(x, lambda_grid), type = "l",
+     xlab = expression(lambda), ylab = expression(psi(x, lambda)),
+     main = "psi: L1/L2-norm ratio of the soft-thresholded vector")
+abline(h = c(1, sqrt(length(x))), lty = 2, col = "grey50")
+```
+
+## Using `psi` to find the projection threshold
+
+`projL1L2regular()` sorts `abs(x)` in decreasing order and uses `psi()` on
+that sorted vector to locate the largest index `i` for which
+`psi(xtilde, xtilde[i])` is still above the target radius `rds`; this
+pinpoints the two thresholds between which the desired `lambda` lies before
+interpolating exactly.
+
+```{r}
+rds <- 2
+xtilde <- sort(abs(x), decreasing = TRUE)
+psi_xtilde <- psi(xtilde, xtilde)
+psi_xtilde
+i <- max(which(psi_xtilde <= rds))
+i
+```
+
+We can check that the resulting projection indeed reaches (approximately)
+the target L1/L2 ratio:
+
+```{r}
+res <- projL1L2(x, rds = rds)
+c(target = rds, achieved = normL1(res$x) / normL2(res$x))
+```

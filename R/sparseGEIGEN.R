@@ -7,19 +7,20 @@
 #'
 #' @param X a square, semi-positive symmetric data matrix to decompose
 #' @param W \bold{W}eights -- the constraints applied to the matrix and thus the eigen vectors.
-#' @param k number of dimensions (default to 2)
-#' @param init
-#' @param seed
-#' @param rds
-#' @param grp
-#' @param orthogonality
-#' @param OrthSpace
-#' @param projPriority
-#' @param itermaxALS
-#' @param itermaxPOCS
-#' @param epsALS
-#' @param epsPOCS
 #' @param k total number of components to return though the full variance will still be returned (see \code{d_full}). If 0, the full set of components are returned.
+#' @param init How to initialize the algorithm, Default: 'svd'
+#' @param seed a random seed for result reproducibility; if NULL (the default), no random seed will be used
+#' @param rds The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension
+#' @param grp vector describing the groups; default to one group per row
+#' @param orthogonality whether the orthogonality constraint is applied on the "loadings" (default)
+#' @param OrthSpace matrix defining the orthogonal space, Default: NULL
+#' @param projPriority the order in which the projections are applied, Default: 'orth'
+#' @param correction4SI correction for the explained variance for sparsity indices, e.g., "gevd" (no correction)
+#' @param itermaxALS the maximum number of ALS iterations, Default: 1000
+#' @param itermaxPOCS the maximum number of POCS iterations, Default: 1000
+#' @param epsALS precision for ALS, Default: 1e-10
+#' @param epsPOCS precision for POCS, Default: 1e-10
+#' @param tol.si tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps
 #'
 #' @return A list with eight elements:
 #' \item{d_full}{A vector containing the singular values of X above the tolerance threshold (based on eigenvalues).}
@@ -30,31 +31,31 @@
 #' \item{q}{Generalized eigenvectors. Dimensions are \code{ncol(X)} by k.}
 #' \item{fj}{Component scores. Dimensions are \code{ncol(X)} by k.}
 #'
-#' @seealso \code{\link{tolerance_eigen}}, \code{\link{gsvd}} and \code{\link{gplssvd}}
+#' @seealso \code{tolerance_eigen} and \code{gsvd} (from the \code{GSVD} package), and \code{\link{gplssvd}}
 #'
 #' @examples
 #'
 #' ## (Metric) Multidimensional Scaling
-#' data(wine, package="GSVD")
+#' data(wine)
 #' D <- as.matrix(dist(wine$objective))
 #' masses <- rep(1/nrow(D), nrow(D))
 #' Xi <- diag(nrow(D)) - ( rep(1,nrow(D)) %o% masses )
 #' S <- Xi %*% (-(D^2) / 2) %*% t(Xi)
-#' mds.res_sparse_geigen <- sparse_geigen(S)
+#' mds.res_sparse_geigen <- sparseGEIGEN(S)
 #'
 #' ## Principal components analysis: "covariance"
 #' cov_X <- as.matrix(cov(wine$objective))
-#' cov_pca.res_sparse_geigen <- sparse_geigen(cov_X)
+#' cov_pca.res_sparse_geigen <- sparseGEIGEN(cov_X)
 #'
 #' ## Principal components analysis: "correlation"
 #' cor_X <- as.matrix(cor(wine$objective))
-#' cor_pca.res_sparse_geigen <- sparse_geigen(cor_X)
+#' cor_pca.res_sparse_geigen <- sparseGEIGEN(cor_X)
 #'
 #' @author Derek Beaton
 #' @keywords multivariate
 
 sparseGEIGEN <- function(X, W, k = 2L,
-                          init = NULL, seed = NULL,
+                          init = "svd", seed = NULL,
                           rds = rep(1, k),
                           grp = NULL,
                           orthogonality = "loadings",

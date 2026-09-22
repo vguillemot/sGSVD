@@ -29,10 +29,10 @@
 #' \item{fj}{Right (columns) component scores.}
 #' \item{ly}{Latent variable scores for rows of \code{Y}}
 #'
-#' @seealso \code{\link{tolerance_svd}}, \code{\link{geigen}} and \code{\link{gsvd}}
+#' @seealso \code{tolerance_svd} and \code{gsvd} (from the \code{GSVD} package)
 #'
 #' @examples
-#'
+#' if (requireNamespace("GSVD", quietly = TRUE)) {
 #'  # Three "two-table" technique examples
 #'  data(wine)
 #'  X <- scale(wine$objective)
@@ -64,6 +64,7 @@
 #'      Y = Y,
 #'      XRW=crossprod(X)
 #'  )
+#' }
 #'
 #' @author Derek Beaton
 #' @keywords multivariate
@@ -373,7 +374,8 @@ gplssvd <- function(X, Y, XLW, YLW, XRW, YRW, k = 0, tol = .Machine$double.eps){
     k <- min(X_dimensions, Y_dimensions)
   }
 
-  res <- tolerance_svd( t(X) %*% Y, nu=k, nv=k, tol=tol)
+  require_GSVD()
+  res <- GSVD::tolerance_svd( t(X) %*% Y, nu=k, nv=k, tol=tol)
   res$d_full <- res$d
   res$l_full <- res$d_full^2
   # res$tau <- (res$l_full/sum(res$l_full)) * 100

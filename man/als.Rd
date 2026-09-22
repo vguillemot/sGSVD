@@ -24,7 +24,48 @@ als(
 }
 \arguments{
 \item{X}{data matrix on which the ALS is performed}
+
+\item{initLeft}{initial left vector}
+
+\item{initRight}{initial right vector}
+
+\item{projLeft}{projection function applied to the left vector at each iteration}
+
+\item{projRight}{projection function applied to the right vector at each iteration}
+
+\item{rdsLeft}{radius of the constraint applied to the left vector}
+
+\item{rdsRight}{radius of the constraint applied to the right vector}
+
+\item{grpLeft}{vector describing the groups for the left vector, Default: NULL}
+
+\item{grpRight}{vector describing the groups for the right vector, Default: NULL}
+
+\item{OrthSpaceLeft}{matrix defining the orthogonal space for the left vector}
+
+\item{OrthSpaceRight}{matrix defining the orthogonal space for the right vector}
+
+\item{itermaxALS}{the maximum number of ALS iterations, Default: 1000}
+
+\item{itermaxPOCS}{the maximum number of POCS iterations, Default: 1000}
+
+\item{epsALS}{precision for ALS, Default: 1e-10}
+
+\item{epsPOCS}{precision for POCS, Default: 1e-10}
+}
+\value{
+A list with the singular value \code{d}, the left and right pseudo-singular
+vectors \code{u} and \code{v}, the number of ALS iterations \code{iterALS}, and
+the total number of POCS iterations \code{iterTOTAL}.
 }
 \description{
 Alternative least squares method helper for the cGSVD
+}
+\examples{
+X <- matrix(rnorm(20), 5, 4)
+als(X, initLeft = svd(X)$u[, 1], initRight = svd(X)$v[, 1],
+    projLeft = projOrth_then_projL1L2, projRight = projOrth_then_projL1L2,
+    rdsLeft = 1, rdsRight = 1,
+    OrthSpaceLeft = matrix(0, 5, 1), OrthSpaceRight = matrix(0, 4, 1),
+    itermaxPOCS = 100, epsPOCS = 1e-8)
 }

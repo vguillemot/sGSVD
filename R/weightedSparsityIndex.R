@@ -59,12 +59,12 @@ weightedSparsityIndex <- function(
   if (is.null(res.sgsvd$grpLeft)) {
     ctrLeft <- U.sq
   } else {
-    ctrLeft <- apply(U.sq, 2, function(x) tapply(x, res.sgsvd$grpLeft, FUN = sum))
+    ctrLeft <- rowsum(U.sq, res.sgsvd$grpLeft)
   }
   if (is.null(res.sgsvd$grpRight)) {
     ctrRight <- V.sq
   } else {
-    ctrRight <- apply(V.sq, 2, function(x) tapply(x, res.sgsvd$grpRight, FUN = sum))
+    ctrRight <- rowsum(V.sq, res.sgsvd$grpRight)
   }
   I <- NROW(ctrLeft)
   J <- NROW(ctrRight)

@@ -1,7 +1,7 @@
 #' is_GSVD
 #'
 #' Tests if the \code{x} object is of class type "GSVD"
-#' @details The three primary functions in the \code{GSVD} package produce an inherited (hierarchical) class structure where all of them are of type "GSVD". Those functions are \code{\link{geigen}}, \code{\link{gsvd}}, and \code{\link{gplssvd}}.
+#' @details The three primary functions in the \code{GSVD} package produce an inherited (hierarchical) class structure where all of them are of type "GSVD". Those functions are \code{geigen}, \code{gsvd}, and \code{\link{gplssvd}}.
 #'
 #' @param x object to test
 #' @return boolean. \code{TRUE} if the object is of class GSVD, FALSE otherwise.
@@ -16,7 +16,7 @@ is_GSVD <- function(x){
 #' is_sSVD
 #'
 #' Tests if the \code{x} object is of class type "sSVD"
-#' @details The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "sSVD". Those functions are \code{\link{sparseSVD}} and \code{\link{sparsePLSC}}.
+#' @details The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "sSVD". Those functions are \code{\link{sparseSVD}} and \code{sparsePLSC}.
 #'
 #' @param x object to test
 #' @return boolean. \code{TRUE} if the object is of class sGSVD, FALSE otherwise.
@@ -31,7 +31,7 @@ is_sSVD<- function(x){
 #' is_sGSVD
 #'
 #' Tests if the \code{x} object is of class type "sGSVD"
-#' @details The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "sGSVD". Those functions are \code{\link{sparseGSVD}}, \code{\link{sparseCA}}, \code{\link{sparseMCA}}, \code{\link{sparseMCA}}, \code{\link{sparseMFA}}, \code{\link{sparseDiCA}}, and \code{\link{sPLSCA}}.
+#' @details The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "sGSVD". Those functions are \code{\link{sparseGSVD}}, \code{sparseCA}, \code{sparseMCA}, \code{sparseMFA}, \code{sparseDiCA}, and \code{sPLSCA}.
 #'
 #' @param x object to test
 #' @return boolean. \code{TRUE} if the object is of class sGSVD, FALSE otherwise.
@@ -46,7 +46,7 @@ is_sGSVD <- function(x){
 #' is_spls
 #'
 #' Tests if the \code{x} object is of class type "sGSVD"
-#' @details The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "spls". Those functions are \code{\link{sparsePLSC}} and \code{\link{sparsePLSCA}}.
+#' @details The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "spls". Those functions are \code{sparsePLSC} and \code{sparsePLSCA}.
 #'
 #' @param x object to test
 #' @return boolean. \code{TRUE} if the object is of class sGSVD, FALSE otherwise.
@@ -61,7 +61,7 @@ is_sPLS <- function(x){
 #' is_GSVD_geigen
 #'
 #' Tests if the \code{x} object is of class type "geigen"
-#' @details Only \code{\link{geigen}} produces this class type.
+#' @details Only \code{geigen} (from the \code{GSVD} package) produces this class type.
 #'
 #' @param x object to test
 #' @return boolean. \code{TRUE} if the object is of class geigen, FALSE otherwise.
@@ -76,7 +76,7 @@ is_GSVD_geigen <- function(x){
 #' is_GSVD_gsvd
 #'
 #' Tests if the \code{x} object is of class type "gsvd"
-#' @details Only \code{\link{gsvd}} produces this class type.
+#' @details Only \code{gsvd} (from the \code{GSVD} package) produces this class type.
 #'
 #' @param x object to test
 #' @return boolean. \code{TRUE} if the object is of class gsvd, FALSE otherwise.
@@ -155,7 +155,13 @@ is_GSVD_gplssvd <- function(x){
 
 
 
-#' @export
+#' Print a \code{geigen} object
+#'
+#' @param x an object of class \code{geigen}, typically produced by \code{geigen} (from the \code{GSVD} package)
+#' @param ... additional arguments, currently unused
+#'
+#' @return \code{x}, invisibly; called for its side effect of printing a summary to the console
+#' @exportS3Method
 print.geigen <- function(x, ...){
 
   if(!is_GSVD(x)){
@@ -186,7 +192,13 @@ print.geigen <- function(x, ...){
 
 }
 
-#' @export
+#' Summarize a \code{geigen} object
+#'
+#' @param object an object of class \code{geigen}, typically produced by \code{geigen} (from the \code{GSVD} package)
+#' @param ... additional arguments, currently unused
+#'
+#' @return \code{object}, invisibly; called for its side effect of printing a summary to the console
+#' @exportS3Method
 summary.geigen <- function(object, ...){
   ## this inheritance is super dumb
   x <- object
@@ -211,7 +223,13 @@ summary.geigen <- function(object, ...){
 }
 
 
-#' @export
+#' Print a \code{gsvd} object
+#'
+#' @param x an object of class \code{gsvd}, typically produced by \code{gsvd} (from the \code{GSVD} package) or \code{\link{sparseGSVD}}
+#' @param ... additional arguments, currently unused
+#'
+#' @return \code{x}, invisibly; called for its side effect of printing a summary to the console
+#' @exportS3Method
 print.gsvd <- function(x, ...){
 
   if(!is_GSVD(x)){
@@ -246,7 +264,13 @@ print.gsvd <- function(x, ...){
 
 }
 
-#' @export
+#' Summarize a \code{gsvd} object
+#'
+#' @param object an object of class \code{gsvd}, typically produced by \code{gsvd} (from the \code{GSVD} package) or \code{\link{sparseGSVD}}
+#' @param ... additional arguments, currently unused
+#'
+#' @return \code{object}, invisibly; called for its side effect of printing a summary to the console
+#' @exportS3Method
 summary.gsvd <- function(object, ...){
   ## this inheritance is super dumb
   x <- object
@@ -270,7 +294,13 @@ summary.gsvd <- function(object, ...){
 
 }
 
-#' @export
+#' Print a \code{gplssvd} object
+#'
+#' @param x an object of class \code{gplssvd}, typically produced by \code{\link{gplssvd}}
+#' @param ... additional arguments, currently unused
+#'
+#' @return \code{x}, invisibly; called for its side effect of printing a summary to the console
+#' @exportS3Method
 print.gplssvd <- function(x, ...){
 
   if(!is_GSVD(x)){
@@ -306,7 +336,13 @@ print.gplssvd <- function(x, ...){
 
 }
 
-#' @export
+#' Summarize a \code{gplssvd} object
+#'
+#' @param object an object of class \code{gplssvd}, typically produced by \code{\link{gplssvd}}
+#' @param ... additional arguments, currently unused
+#'
+#' @return \code{object}, invisibly; called for its side effect of printing a summary to the console
+#' @exportS3Method
 summary.gplssvd <- function(object, ...){
 
   ## this inheritance is super dumb

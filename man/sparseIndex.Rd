@@ -17,6 +17,10 @@ sparseIndexEigen(res.sgevd, eigenValues, correction = "gevd", tol = 1e-10)
 \item{correction}{The type of correction for proportion of explained variance (r1), e.g., "gsvd" (no correction), "mca", "mfa"}
 
 \item{tol}{a tolerance parameter indicating when a small value should be considered equal to 0}
+
+\item{res.sgevd}{The result of a sparse Generalized EigenValue Decomposition of a data-matrix, usually obtained with sGSVD::sparseGEIGEN}
+
+\item{eigenValues}{The eigenvalues of the original data matrix (used to compute the fit of the sparse analysis)}
 }
 \value{
 various sparsity indices and their components.

@@ -7,7 +7,7 @@
 sparseEIGENpos(
   X,
   k = 2L,
-  init = NULL,
+  init = "svd",
   seed = NULL,
   rds = rep(1, k),
   grp = NULL,
@@ -25,11 +25,27 @@ sparseEIGENpos(
 
 \item{k}{the desired rank of the singular decomposition;}
 
-\item{init}{How to initialize the algorithm}
+\item{init}{How to initialize the algorithm, Default: 'svd'}
+
+\item{seed}{a random seed for result reproducibility; if NULL (the default), no random seed will be used}
 
 \item{rds}{The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension;}
 
-\item{epsPOCS}{$L_1$ ball for each left vector}
+\item{grp}{vector describing the groups; default to one group per row}
+
+\item{orthogonality}{whether the orthogonality constraint is applied on the "loadings" (default)}
+
+\item{OrthSpace}{matrix defining the orthogonal space, Default: NULL}
+
+\item{projPriority}{the order in which the projections are applied, Default: 'sparsity'}
+
+\item{itermaxALS}{the maximum number of ALS iterations, Default: 1000}
+
+\item{itermaxPOCS}{the maximum number of POCS iterations, Default: 1000}
+
+\item{epsALS}{precision for ALS, Default: 1e-10}
+
+\item{epsPOCS}{precision for POCS, Default: 1e-10}
 }
 \value{
 Pseudo-eigen vectors and values
@@ -39,7 +55,7 @@ Constrained eigen-value decomposition of a symmetric matrix with an additionnal 
 }
 \examples{
 U <- matrix(rnorm(20), 5, 4)
-sparseEIGEN(U \%*\% t(U))
+sparseEIGENpos(U \%*\% t(U))
 }
 \author{
 Vincent Guillemot

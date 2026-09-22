@@ -7,7 +7,7 @@
 sparseEIGEN(
   X,
   k = 2L,
-  init = NULL,
+  init = "svd",
   seed = NULL,
   rds = rep(1, k),
   grp = NULL,
@@ -33,9 +33,31 @@ svd (default) = initializes with the SVD,
 eig or eigen = initializes with the EVD,
 rand = initializes with a random vector.}
 
+\item{seed}{a random seed for result reproducibility; if NULL (the default), no random seed will be used}
+
 \item{rds}{The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension;}
 
-\item{epsPOCS}{$L_1$ ball for each left vector}
+\item{grp}{vector describing the groups; default to one group per row}
+
+\item{orthogonality}{whether the orthogonality constraint is applied on the "loadings" (default)}
+
+\item{OrthSpace}{matrix defining the orthogonal space, Default: NULL}
+
+\item{projPriority}{the order in which the projections are applied, Default: 'orth'}
+
+\item{compute_sparsity_index}{whether the sparsity index should be computed, Default: TRUE}
+
+\item{correction4SI}{correction for the explained variance for sparsity indices, e.g., "gevd" (no correction)}
+
+\item{itermaxALS}{the maximum number of ALS iterations, Default: 1000}
+
+\item{itermaxPOCS}{the maximum number of POCS iterations, Default: 1000}
+
+\item{epsALS}{precision for ALS, Default: 1e-10}
+
+\item{epsPOCS}{precision for POCS, Default: 1e-10}
+
+\item{tol.si}{tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps}
 }
 \value{
 Pseudo-eigen vectors and values

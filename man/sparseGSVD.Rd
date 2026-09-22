@@ -40,42 +40,46 @@ sparseGSVD(
 
 \item{Y}{a second (data) matrix; this is optional and is only used for a two-table method, Default: NULL}
 
-\item{LW}{PARAM_DESCRIPTION}
+\item{LW}{left constraints (weights) applied to X (and thus to the left pseudo-singular vectors)}
 
-\item{RW}{PARAM_DESCRIPTION}
+\item{RW}{right constraints (weights) applied to X (and thus to the right pseudo-singular vectors)}
+
+\item{LM}{left masses, used to compute the singular vectors' contributions}
+
+\item{RM}{right masses, used to compute the singular vectors' contributions}
 
 \item{k}{the desired rank of the singular decomposition, Default: 0}
 
-\item{tol}{PARAM_DESCRIPTION, Default: .Machine$double.eps}
+\item{tol}{tolerance below which singular values are considered zero, Default: .Machine$double.eps}
 
 \item{init}{How to initialize the algorithm, Default: 'svd'}
 
-\item{initLeft}{PARAM_DESCRIPTION, Default: NULL}
+\item{initLeft}{how the left pseudo-singular vectors are initialized, Default: NULL}
 
-\item{initRight}{PARAM_DESCRIPTION, Default: NULL}
+\item{initRight}{how the right pseudo-singular vectors are initialized, Default: NULL}
 
-\item{seed}{PARAM_DESCRIPTION, Default: NULL}
+\item{seed}{a random seed for result reproducibility; if NULL (the default), no random seed will be used, Default: NULL}
 
 \item{rdsLeft}{The radius (>0) of the
 $L_1$ ball for each left vector, Default: rep(1, k)}
 
 \item{rdsRight}{The radius (>0) of the $L_1$ balls for each right vector, Default: rep(1, k)}
 
-\item{grpLeft}{PARAM_DESCRIPTION, Default: NULL}
+\item{grpLeft}{vector describing the groups for the left vectors, Default: NULL}
 
-\item{grpRight}{PARAM_DESCRIPTION, Default: NULL}
+\item{grpRight}{vector describing the groups for the right vectors, Default: NULL}
 
-\item{orthogonality}{PARAM_DESCRIPTION, Default: 'loadings'}
+\item{orthogonality}{whether the orthogonality constraint is applied on the "loadings" (default), the "scores", or "both"}
 
-\item{OrthSpaceLeft}{PARAM_DESCRIPTION, Default: NULL}
+\item{OrthSpaceLeft}{matrix defining the orthogonal space for the left vectors, Default: NULL}
 
-\item{OrthSpaceRight}{PARAM_DESCRIPTION, Default: NULL}
+\item{OrthSpaceRight}{matrix defining the orthogonal space for the right vectors, Default: NULL}
 
-\item{projPriority}{PARAM_DESCRIPTION, Default: 'orth'}
+\item{projPriority}{the order in which the projections are applied, Default: 'orth'}
 
-\item{projPriorityLeft}{PARAM_DESCRIPTION, Default: projPriority}
+\item{projPriorityLeft}{the order in which the projections are applied for the left vectors, Default: projPriority}
 
-\item{projPriorityRight}{PARAM_DESCRIPTION, Default: projPriority}
+\item{projPriorityRight}{the order in which the projections are applied for the right vectors, Default: projPriority}
 
 \item{correction4SI}{Correction for the explained variance for sparsity indices, e.g., "gsvd" (no correction), "mca" (Benzecri correction of MCA), or "mfa"}
 

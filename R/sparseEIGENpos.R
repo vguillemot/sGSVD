@@ -2,27 +2,26 @@
 #'
 #' @param X a symmetric square (data) matrix;
 #' @param k the desired rank of the singular decomposition;
-#' @param init How to initialize the algorithm
+#' @param init How to initialize the algorithm, Default: 'svd'
 #' @param rds The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension;
-#' @param seed
-#' @param grp
-#' @param orthogonality
-#' @param OrthSpace
-#' @param projPriority
-#' @param itermaxALS
-#' @param itermaxPOCS
-#' @param epsALS
-#' @param epsPOCS
-#' $L_1$ ball for each left vector
+#' @param seed a random seed for result reproducibility; if NULL (the default), no random seed will be used
+#' @param grp vector describing the groups; default to one group per row
+#' @param orthogonality whether the orthogonality constraint is applied on the "loadings" (default)
+#' @param OrthSpace matrix defining the orthogonal space, Default: NULL
+#' @param projPriority the order in which the projections are applied, Default: 'sparsity'
+#' @param itermaxALS the maximum number of ALS iterations, Default: 1000
+#' @param itermaxPOCS the maximum number of POCS iterations, Default: 1000
+#' @param epsALS precision for ALS, Default: 1e-10
+#' @param epsPOCS precision for POCS, Default: 1e-10
 #' @return Pseudo-eigen vectors and values
 #' @examples
 #' U <- matrix(rnorm(20), 5, 4)
-#' sparseEIGEN(U %*% t(U))
+#' sparseEIGENpos(U %*% t(U))
 #' @author Vincent Guillemot
 #' @export
 sparseEIGENpos <- function(
   X, k = 2L,
-  init = NULL, seed = NULL,
+  init = "svd", seed = NULL,
   rds = rep(1, k),
   grp = NULL,
   orthogonality = "loadings",
@@ -82,68 +81,13 @@ sparseEIGENpos <- function(
   return(res)
 }
 
-runTestsEIGEN <- function(X, k, init, seed,
-                          rds, grp,
-                          orthogonality, OrthSpace,
-                          projPriority) {
-
-  ##### Test X ####
-  if (nrow(X)==1 & ncol(X)==1)
-    stop("You are attempting a gsGSVD of a scalar.")
-
-  if (nrow(X) != ncol(X))
-    stop("X should be a square matrix.")
-
-  if (!isSymmetric(unname(X)))
-    stop("X should be symmetric.")
-
-  if (any(is.na(X)))
-    stop("X should not contain missing values")
-
-  ##### Test k ####
-  if (!is.integer(k)) stop("k should be an integer.")
-  if (k <= 1) stop("k should be > 1.")
-
-  ##### Test initialization ####
-  if (is.null(init)) {
-    stop("init should be either svd or rand or a matrix.")
-  }
-
-  if (is.character(init)) {
-    if (!init %in% c("svd", "rand"))
-      stop("init should be either svd or rand.")
-  }
-
-  if (is.matrix(init)) {
-    if (any(dim(init) != c(nrow(X), k))) {
-      stop("Wrong dimensions for initalization matrix!")
-    }
-  }
-
-  return(NULL)
-}
-
-initializeEIGEN <- function(X, I, k, init, seed = NULL) {
-
-  if (!is.null(seed)) set.seed(seed)
-
-  if (is.character(init)) {
-    if (init == "svd") {
-      svdx <- svd(X, nu=k, nv=k)
-      U0 <- svdx$u
-    } else if (init == "rand") {
-      U0 <- 1/(I-1) * mvrnorm(n = I, mu = rep(0,k),
-                              Sigma = diag(k), empirical = TRUE)
-    }
-  } else if (is.matrix(init)) {
-    U0 <- init
-  } else {
-    stop("Wrong initialization parameters.")
-  }
-
-  return(list(U0 = U0))
-}
-
+#' Build the composed positive projection function for a given priority order
+#'
+#' @param projPriority the order in which the projections are applied (cannot be 'orth')
+#' @param grp vector describing the groups, or NULL for a plain L1L2 constraint
+#'
+#' @return a projection function suitable for \code{\link{powerIteration}}
+#' @noRd
 makeComposedPositiveProjection <- function(projPriority, grp) {
   if (projPriority == "orth") {
     stop("Cannot have orthogonal priority with a positive constraint... yet!")

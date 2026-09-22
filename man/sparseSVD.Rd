@@ -56,7 +56,21 @@ sparseSVD(
 
 \item{grpRight}{vector describing the groups for the right vectors ; default to one group per column ;}
 
-\item{orthogonality}{wh the orthogonality constraint will}
+\item{orthogonality}{whether the orthogonality constraint is applied on the "loadings" (default), the "scores", or "both"}
+
+\item{OrthSpaceLeft}{matrix defining the orthogonal space for the left vectors, Default: NULL}
+
+\item{OrthSpaceRight}{matrix defining the orthogonal space for the right vectors, Default: NULL}
+
+\item{projPriority}{the order in which the projections are applied, Default: 'orth'}
+
+\item{projPriorityLeft}{the order in which the projections are applied for the left vectors, Default: projPriority}
+
+\item{projPriorityRight}{the order in which the projections are applied for the right vectors, Default: projPriority}
+
+\item{compute_sparsity_index}{whether the sparsity index should be computed, Default: TRUE}
+
+\item{correction4SI}{Correction for the explained variance for sparsity indices, e.g., "gsvd" (no correction), "mca" (Benzecri correction of MCA), or "mfa"}
 
 \item{itermaxALS}{The maximum number of ALS iterations}
 
@@ -65,6 +79,8 @@ sparseSVD(
 \item{epsALS}{Precision for ALS}
 
 \item{epsPOCS}{Precision for POCS}
+
+\item{tol.si}{Tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps}
 }
 \value{
 Pseudo-singular vectors and values

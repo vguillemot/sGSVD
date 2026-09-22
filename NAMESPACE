@@ -6,7 +6,6 @@ S3method(print,gsvd)
 S3method(summary,geigen)
 S3method(summary,gplssvd)
 S3method(summary,gsvd)
-S3method(unique,column)
 export(als)
 export(are_all_values_positive)
 export(compute.fit)
@@ -25,6 +24,9 @@ export(is_empty_matrix)
 export(is_sGSVD)
 export(is_sPLS)
 export(is_sSVD)
+export(normL1)
+export(normL2)
+export(normLG)
 export(projL1)
 export(projL1L2)
 export(projL1L2_then_projOrth)
@@ -51,5 +53,15 @@ export(sparseIndexEigen)
 export(sparseSVD)
 export(sqrt_psd_matrix)
 export(ssq)
+export(unique_column)
 export(weightedSparsityIndex)
-importFrom(MASS,ginv)
+importFrom(MASS,
+  ginv,
+  mvrnorm
+)
+importFrom(stats,
+  ave,
+  na.omit,
+  rnorm,
+  runif
+)

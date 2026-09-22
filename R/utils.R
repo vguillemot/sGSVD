@@ -1,6 +1,18 @@
 # imports from other packages
-#' @importFrom MASS ginv
+#' @importFrom MASS ginv mvrnorm
+#' @importFrom stats ave na.omit rnorm runif
 NULL
+
+#' Check that the (optional, non-CRAN) GSVD package is available
+#'
+#' @return NULL, invisibly; called for its side effect of raising an error when GSVD is missing
+#' @noRd
+require_GSVD <- function() {
+  if (!requireNamespace("GSVD", quietly = TRUE)) {
+    stop("The GSVD package is required for this function. ",
+         "Install it with remotes::install_github('vguillemot/GSVD').", call. = FALSE)
+  }
+}
 
 
 #' @export
@@ -101,7 +113,7 @@ are_all_values_positive <- function(x){
 #' @param x A square matrix (presumably positive semi-definite)
 #'
 #' @return A matrix. The square root of the \code{x} matrix
-#' @seealso \code{\link{tolerance_eigen}}
+#' @seealso \code{tolerance_eigen} (from the \code{GSVD} package)
 
 sqrt_psd_matrix <- function(x){
 
@@ -120,7 +132,8 @@ sqrt_psd_matrix <- function(x){
   }
 
   ## tolerance_eigen
-  res <- tolerance_eigen(x, tol = 1e-13)
+  require_GSVD()
+  res <- GSVD::tolerance_eigen(x, tol = 1e-13)
 
   ## rebuild
   return(t(t(res$vectors) * sqrt(res$values) ) %*% t(res$vectors))
@@ -139,7 +152,7 @@ sqrt_psd_matrix <- function(x){
 #' @param x A square matrix (presumably positive semi-definite)
 #'
 #' @return A matrix. The inverse square root of the \code{x} matrix
-#' @seealso \code{\link{tolerance_eigen}}
+#' @seealso \code{tolerance_eigen} (from the \code{GSVD} package)
 
 invsqrt_psd_matrix <- function(x){
 
@@ -158,7 +171,8 @@ invsqrt_psd_matrix <- function(x){
   }
 
   ## tolerance_eigen
-  res <- tolerance_eigen(x, tol = 1e-13)
+  require_GSVD()
+  res <- GSVD::tolerance_eigen(x, tol = 1e-13)
 
   ## rebuild
   return(t(t(res$vectors) * (1/sqrt(res$values)) ) %*% t(res$vectors))

@@ -16,7 +16,7 @@ boolean. \code{TRUE} if the object is of class gsvd, FALSE otherwise.
 Tests if the \code{x} object is of class type "gsvd"
 }
 \details{
-Only \code{\link{gsvd}} produces this class type.
+Only \code{gsvd} (from the \code{GSVD} package) produces this class type.
 }
 \seealso{
 \code{\link{inherits}}

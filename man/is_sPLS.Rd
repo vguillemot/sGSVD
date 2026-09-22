@@ -16,7 +16,7 @@ boolean. \code{TRUE} if the object is of class sGSVD, FALSE otherwise.
 Tests if the \code{x} object is of class type "sGSVD"
 }
 \details{
-The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "spls". Those functions are \code{\link{sparsePLSC}} and \code{\link{sparsePLSCA}}.
+The three primary functions in the \code{sGSVD} package produce an inherited (hierarchical) class structure where all of them are of type "spls". Those functions are \code{sparsePLSC} and \code{sparsePLSCA}.
 }
 \seealso{
 \code{\link{inherits}}

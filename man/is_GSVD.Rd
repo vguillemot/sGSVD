@@ -16,7 +16,7 @@ boolean. \code{TRUE} if the object is of class GSVD, FALSE otherwise.
 Tests if the \code{x} object is of class type "GSVD"
 }
 \details{
-The three primary functions in the \code{GSVD} package produce an inherited (hierarchical) class structure where all of them are of type "GSVD". Those functions are \code{\link{geigen}}, \code{\link{gsvd}}, and \code{\link{gplssvd}}.
+The three primary functions in the \code{GSVD} package produce an inherited (hierarchical) class structure where all of them are of type "GSVD". Those functions are \code{geigen}, \code{gsvd}, and \code{\link{gplssvd}}.
 }
 \seealso{
 \code{\link{inherits}}

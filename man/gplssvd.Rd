@@ -43,7 +43,7 @@ A list with thirteen elements:
   Right constraints for each data matrix are used for the orthogonality conditions.
 }
 \examples{
-
+if (requireNamespace("GSVD", quietly = TRUE)) {
  # Three "two-table" technique examples
  data(wine)
  X <- scale(wine$objective)
@@ -75,10 +75,11 @@ A list with thirteen elements:
      Y = Y,
      XRW=crossprod(X)
  )
+}
 
 }
 \seealso{
-\code{\link{tolerance_svd}}, \code{\link{geigen}} and \code{\link{gsvd}}
+\code{tolerance_svd} and \code{gsvd} (from the \code{GSVD} package)
 }
 \author{
 Derek Beaton

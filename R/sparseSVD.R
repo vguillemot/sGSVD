@@ -13,16 +13,19 @@
 #' (>0) of the $L_1$ or $L_G$ balls for each of the k right vectors ;
 #' @param grpLeft vector describing the groups for the left vectors ; default to one group per row ;
 #' @param grpRight vector describing the groups for the right vectors ; default to one group per column ;
-#' @param orthogonality wh the orthogonality constraint will
-#' @param OrthSpaceLeft
-#' @param OrthSpaceRight
-#' @param projPriority
-#' @param projPriorityLeft
-#' @param projPriorityRight
+#' @param orthogonality whether the orthogonality constraint is applied on the "loadings" (default), the "scores", or "both"
+#' @param OrthSpaceLeft matrix defining the orthogonal space for the left vectors, Default: NULL
+#' @param OrthSpaceRight matrix defining the orthogonal space for the right vectors, Default: NULL
+#' @param projPriority the order in which the projections are applied, Default: 'orth'
+#' @param projPriorityLeft the order in which the projections are applied for the left vectors, Default: projPriority
+#' @param projPriorityRight the order in which the projections are applied for the right vectors, Default: projPriority
 #' @param itermaxALS The maximum number of ALS iterations
 #' @param itermaxPOCS The maximum number of POCS iterations
 #' @param epsALS Precision for ALS
 #' @param epsPOCS Precision for POCS
+#' @param compute_sparsity_index whether the sparsity index should be computed, Default: TRUE
+#' @param correction4SI Correction for the explained variance for sparsity indices, e.g., "gsvd" (no correction), "mca" (Benzecri correction of MCA), or "mfa"
+#' @param tol.si Tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps
 #'
 #' @return Pseudo-singular vectors and values
 #' @examples
@@ -131,8 +134,8 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
                         U.Rv[, (1:r), drop = FALSE])
       VLy.bind <- cbind(V[, (1:r), drop = FALSE],
                         V.Ru[, (1:r), drop = FALSE])
-      ULx <- unique.column(ULx.bind, n.round = 10)
-      VLy <- unique.column(VLy.bind, n.round = 10)
+      ULx <- unique_column(ULx.bind, n.round = 10)
+      VLy <- unique_column(VLy.bind, n.round = 10)
 
       ## Replace QR by SVD to avoid strange behaviors
       # OrthSpaceLeft <- qr.Q(qr(ULx))
@@ -176,6 +179,13 @@ sparseSVD <- function(X, Y = NULL, k = 2L,
 
 
 
+#' Build the composed projection function for a given priority order
+#'
+#' @param projPriority the order in which the projections are applied, either 'orth' or 'sparsity'
+#' @param grp vector describing the groups, or NULL for a plain L1L2 constraint
+#'
+#' @return a projection function suitable for \code{\link{als}}
+#' @noRd
 makeComposedProjection <- function(projPriority, grp) {
   if (projPriority == "orth") {
     if (is.null(grp)) return(projL1L2_then_projOrth)
@@ -186,14 +196,34 @@ makeComposedProjection <- function(projPriority, grp) {
   }
 }
 
-runTestsSVD <- function(X, k, init, initLeft, initRight,
+#' Validate the arguments of \code{\link{sparseSVD}}
+#'
+#' @param X a (data) matrix
+#' @param k the desired rank of the singular decomposition
+#' @param init how the pseudo-singular vectors are initialized
+#' @param initLeft how the left pseudo-singular vectors are initialized
+#' @param initRight how the right pseudo-singular vectors are initialized
+#' @param seed a random seed for result reproducibility
+#' @param rdsLeft a vector of radiuses for the left vectors
+#' @param rdsRight a vector of radiuses for the right vectors
+#' @param grpLeft vector describing the groups for the left vectors
+#' @param grpRight vector describing the groups for the right vectors
+#' @param orthogonality whether the orthogonality constraint is applied on the loadings, the scores, or both
+#' @param OrthSpaceLeft matrix defining the orthogonal space for the left vectors
+#' @param OrthSpaceRight matrix defining the orthogonal space for the right vectors
+#' @param projPriority the order in which the projections are applied
+#' @param projPriorityLeft the order in which the projections are applied for the left vectors
+#' @param projPriorityRight the order in which the projections are applied for the right vectors
+#'
+#' @return NULL, invisibly; called for its side effect of raising an error on invalid input
+#' @noRd
+runTestsSVD <- function(X, k, init, initLeft, initRight, seed,
                          rdsLeft, rdsRight,
                          grpLeft, grpRight,
+                         orthogonality, OrthSpaceLeft, OrthSpaceRight,
                          projPriority,
                          projPriorityLeft,
-                         projPriorityRight,
-                         itermaxALS, itermaxPOCS,
-                         epsALS, epsPOCS) {
+                         projPriorityRight) {
 
   ##### Test X ####
   if (nrow(X)==1 & ncol(X)==1)
@@ -219,6 +249,19 @@ runTestsSVD <- function(X, k, init, initLeft, initRight,
   return(NULL)
 }
 
+#' Build the initial left/right pseudo-singular vectors for \code{\link{sparseSVD}}
+#'
+#' @param X a (data) matrix
+#' @param I number of rows of X
+#' @param J number of columns of X
+#' @param k the desired rank of the singular decomposition
+#' @param init how the pseudo-singular vectors are initialized
+#' @param initLeft how the left pseudo-singular vectors are initialized
+#' @param initRight how the right pseudo-singular vectors are initialized
+#' @param seed a random seed for result reproducibility, Default: NULL
+#'
+#' @return A list with the initial left (\code{U0}) and right (\code{V0}) vectors
+#' @noRd
 initializeSVD <- function(X, I, J, k, init, initLeft, initRight, seed = NULL) {
 
   if (!is.null(seed)) set.seed(seed)

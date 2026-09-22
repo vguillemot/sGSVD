@@ -1,12 +1,15 @@
 #' L1-, L2-, L1L2- or LG- projection operators applied to a vector of numerics
 #'
-#' @param vec, vector of numeric value
-#' @param rds, radius
-#' @param grp, vector describing the groups
-#' @param OrthSpace, matrix defining the orthogonal space
+#' @param vec vector of numeric values
+#' @param rds radius
+#' @param grp vector describing the groups
+#' @param OrthSpace matrix defining the orthogonal space
+#' @param method which algorithm to use, either "regular" (default) or "fast"
+#' @param itermax the maximum number of POCS iterations
+#' @param eps precision for the POCS iterations
 #'
-#' @return the L1-, L2-, L1L2- or LG- projection projection of a vector of numerics
-#' @export
+#' @return the L1-, L2-, L1L2- or LG- projection of a vector of numerics
+#' @name proj
 #'
 #' @examples
 #' x <- c(-0.1, 1, 0.5)
@@ -28,7 +31,7 @@ projL1 <- function(vec, rds) {
   if (normL1(vec) <= rds) {
     return(list(x = vec, lambda = 0, k = NaN))
   }
-  u <- sort(abs(vec), decreasing = TRUE)
+  u <- sort.int(abs(vec), decreasing = TRUE, method = "quick")
   n <- length(vec)
   ukmaok <- (cumsum(u) - rds)/(1:n)
   K <- max(which(ukmaok < u))
@@ -60,6 +63,13 @@ projL1L2 <- function(vec, rds, method = "regular") {
   return(res)
 }
 
+#' Fast (randomized pivot search) L1L2 projection
+#'
+#' @param vec vector of numeric values
+#' @param rds radius
+#'
+#' @return the L1L2 projection of vec
+#' @noRd
 projL1L2fast <- function(vec, rds) {
   norm2_x <- normL2(vec)
   if (norm2_x < .Machine$double.eps) {
@@ -160,6 +170,39 @@ projL1L2fast <- function(vec, rds) {
   ))
 }
 
+#' L1/L2-norm ratio (and L2-norm) of a sorted vector after soft-thresholding at each of its own entries
+#'
+#' Equivalent to \code{psi(xtilde, xtilde)} but computed in O(n) via cumulative
+#' sums instead of O(n^2) (one \code{proxL1} pass per entry), exploiting the
+#' fact that \code{xtilde} is sorted in decreasing order. Also returns the
+#' L2-norm at each threshold, since \code{projL1L2regular} needs it and it is
+#' already computed as an intermediate here.
+#'
+#' @param xtilde a vector of numeric values sorted in decreasing order
+#'
+#' @return a list with \code{psi} (the L1/L2-norm ratio of \code{xtilde}
+#' soft-thresholded at each \code{xtilde[j]}) and \code{L2} (the corresponding
+#' L2-norms)
+#' @noRd
+psi_sorted_self <- function(xtilde) {
+  n <- length(xtilde)
+  csum <- cumsum(xtilde)
+  csumsq <- cumsum(xtilde^2)
+  csum_prev <- c(0, csum[-n])
+  csumsq_prev <- c(0, csumsq[-n])
+  jm1 <- seq_len(n) - 1
+  L1 <- csum_prev - jm1 * xtilde
+  L2sq <- csumsq_prev - 2 * xtilde * csum_prev + jm1 * xtilde^2
+  list(psi = L1 / sqrt(L2sq), L2 = sqrt(L2sq))
+}
+
+#' L1L2 projection via a sorted search on \code{psi}
+#'
+#' @param vec vector of numeric values
+#' @param rds radius
+#'
+#' @return the L1L2 projection of vec
+#' @noRd
 projL1L2regular <- function(vec, rds) {
   norm2_x <- normL2(vec)
   if (norm2_x < .Machine$double.eps) {
@@ -194,15 +237,16 @@ projL1L2regular <- function(vec, rds) {
   # 1. Take the absolute value of $\x$
   #   and sort its elements in decreasing order
   # to get $\widetilde{\x}$\;
-  xtilde <- sort(abs(vec), decreasing = TRUE)
-  psi_xtilde <- psi(xtilde, xtilde)
+  xtilde <- sort.int(abs(vec), decreasing = TRUE, method = "quick")
+  psi_res <- psi_sorted_self(xtilde)
+  psi_xtilde <- psi_res$psi
   # 2. Find i such that
   # $\psi(\widetilde{x}_{i+1})\leq c<\psi(\widetilde x_{i})$\;
   i <- max(which(psi_xtilde <= rds))
   # 3. Let $\displaystyle \delta = \frac{\normTwo{S(\widetilde{\x}	,
   #                                                 \widetilde x_i)}}{i}\left( c\sqrt{\frac{i-\psi(\widetilde x_i)^2}{i-c^2}}
   #                                                                            - \psi(\widetilde x_i)\right)$\;
-  t1 <- normL2(proxL1(xtilde, xtilde[i])) / i
+  t1 <- psi_res$L2[i] / i
   t2 <- (i - psi_xtilde[i]^2) / (i - rds^2)
   t3 <- psi_xtilde[i]
   delta <- t1 * (rds * sqrt(t2) - t3)
@@ -216,14 +260,30 @@ projL1L2regular <- function(vec, rds) {
   ))
 }
 
-phi <- Vectorize(function(x, lambda) {
-  return(normL1(proxL1(vec = x, lambda = lambda)))
-}, vectorize.args = "lambda")
+#' L1-norm of \code{x} after soft-thresholding at \code{lambda}
+#'
+#' @param x vector of numeric values
+#' @param lambda one or more soft-thresholding parameters
+#'
+#' @return the L1-norm of the soft-thresholded \code{x}, for each \code{lambda}
+#' @noRd
+phi <- function(x, lambda) {
+  sapply(lambda, function(l) normL1(proxL1(vec = x, lambda = l)))
+}
 
-psi <- Vectorize(function(x, lambda) {
-  x_soft <- proxL1(vec = x, lambda = lambda)
-  return(normL1(x_soft) / normL2(x_soft))
-}, vectorize.args = "lambda")
+#' L1/L2-norm ratio of \code{x} after soft-thresholding at \code{lambda}
+#'
+#' @param x vector of numeric values
+#' @param lambda one or more soft-thresholding parameters
+#'
+#' @return the L1/L2-norm ratio of the soft-thresholded \code{x}, for each \code{lambda}
+#' @noRd
+psi <- function(x, lambda) {
+  sapply(lambda, function(l) {
+    x_soft <- proxL1(vec = x, lambda = l)
+    normL1(x_soft) / normL2(x_soft)
+  })
+}
 
 
 #' @rdname proj
@@ -251,6 +311,14 @@ projLGL2 <- function(vec, rds, grp, method = "regular") {
   return(res)
 }
 
+#' Fast (randomized pivot search) group-L2 projection
+#'
+#' @param vec vector of numeric values
+#' @param rds radius
+#' @param grp vector describing the groups
+#'
+#' @return the group-L2 projection of vec
+#' @noRd
 projLGL2fast <- function(vec, rds, grp) {
   grpvec <- tapply(vec, grp, normL2)
   norm2_x <- normL2(grpvec)
@@ -348,6 +416,14 @@ projLGL2fast <- function(vec, rds, grp) {
 }
 
 
+#' Group-L2 projection via a sorted search (\code{projL1L2regular} on group norms)
+#'
+#' @param vec vector of numeric values
+#' @param rds radius
+#' @param grp vector describing the groups
+#'
+#' @return the group-L2 projection of vec
+#' @noRd
 projLGL2regular <- function(vec, rds, grp) {
   grpvec <- tapply(vec, grp, normL2)
   norm2_x <- normL2(grpvec)
@@ -414,8 +490,8 @@ projOrth <- function(vec, OrthSpace) {
 #' @rdname proj
 #' @export
 
-projPos <- function(x) {
-  res <- pmax(x, 0)
+projPos <- function(vec) {
+  res <- pmax(vec, 0)
   return(list(x = res, lambda = NA, k = NaN))
 }
 
@@ -426,11 +502,11 @@ projPos <- function(x) {
 projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps) {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projOrth(projL1L2(vecold, rds)$x, OrthSpace)$x
+    res.projL1L2 <- projL1L2(vecold, rds)
+    vecnew <- projOrth(res.projL1L2$x, OrthSpace)$x
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  res.projL1L2 <- projL1L2(vecold, rds)
   return(list(x = vecnew, lambda = res.projL1L2$lambda, k = iter))
 }
 
@@ -439,11 +515,11 @@ projL1L2_then_projOrth <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
 projLGL2_then_projOrth <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projOrth(projLGL2(vecold, rds, grp)$x, OrthSpace)$x
+    res.projLGL2 <- projLGL2(vecold, rds, grp)
+    vecnew <- projOrth(res.projLGL2$x, OrthSpace)$x
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  res.projLGL2 <- projLGL2(vecold, rds, grp)
   return(list(x = vecnew, lambda = res.projLGL2$lambda, k = iter))
 }
 
@@ -452,11 +528,11 @@ projLGL2_then_projOrth <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
 projOrth_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projL1L2(projOrth(vecold, OrthSpace)$x, rds)$x
-      if (normL2(vecnew - vecold) < eps) break
+    res.projL1L2 <- projL1L2(projOrth(vecold, OrthSpace)$x, rds)
+    vecnew <- res.projL1L2$x
+    if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  res.projL1L2 <- projL1L2(projOrth(vecold, OrthSpace)$x, rds)
   return(list(x = vecnew, lambda = res.projL1L2$lambda, k = iter))
 }
 
@@ -465,11 +541,11 @@ projOrth_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps
 projOrth_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projLGL2(projOrth(vecold, OrthSpace)$x, rds, grp)$x
-      if (normL2(vecnew - vecold) < eps) break
+    res.projLGL2 <- projLGL2(projOrth(vecold, OrthSpace)$x, rds, grp)
+    vecnew <- res.projLGL2$x
+    if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  res.projLGL2 <- projLGL2(projOrth(vecold, OrthSpace)$x, rds, grp)
   return(list(x = vecnew, lambda = res.projLGL2$lambda, k = iter))
 }
 
@@ -479,11 +555,11 @@ projOrth_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
 projOrth_then_projPos_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projL1L2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds)$x
+    res.projL1L2 <- projL1L2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds)
+    vecnew <- res.projL1L2$x
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  res.projL1L2 <- projL1L2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds)
   return(list(x = vecnew, lambda = res.projL1L2$lambda, k = iter))
 }
 
@@ -492,11 +568,11 @@ projOrth_then_projPos_then_projL1L2 <- function(vec, rds, grp = NULL, OrthSpace,
 projOrth_then_projPos_then_projLGL2 <- function(vec, rds, grp, OrthSpace, itermax, eps)  {
   vecnew <- vecold <- vec
   for (iter in 1:itermax) {
-    vecnew <- projLGL2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds, grp)$x
+    res.projLGL2 <- projLGL2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds, grp)
+    vecnew <- res.projLGL2$x
     if (normL2(vecnew - vecold) < eps) break
     vecold <- vecnew
   }
-  res.projLGL2 <- projLGL2(projPos(projOrth(vecold, OrthSpace)$x)$x, rds, grp)
   return(list(x = vecnew, lambda = res.projLGL2$lambda, k = iter))
 }
 

@@ -1,16 +1,33 @@
 Package: sGSVD
-Type: Package
-Title: The (group) sparse generalized singular value decomposition
-Version: 1.0
-Authors@R: c(person("Vincent","Guillemot",role=c("aut","cre"),email="vincent.guillemot@pasteur.fr"))
-Author: Vincent Guillemot [aut, cre]
-Maintainer: Vincent GUILLEMOT <vincent.guillemot@pasteur.fr>
-Description: A dedicated package for the generalized: eigen decomposition, singular value decomposition (SVD), and partial least squares SVD. 
+Title: The (Group) Sparse Generalized Singular Value Decomposition
+Version: 2.0.0
+Authors@R: c(
+    person(
+        "Vincent",
+        "Guillemot",
+        role = c("aut","cre"),
+        email = "contact@vincentguillemot.fr"))
+Description: Provides sparse and group-sparse variants of the generalized
+    eigenvalue decomposition, the generalized singular value decomposition
+    (SVD), and the partial least squares SVD, via an alternating least
+    squares algorithm with projections onto L1, L1-L2, and group-L1-L2
+    constraints. The package mimics the structure of Beaton, Fatt, and
+    Abdi's (2014) 'GSVD' package, adding sparsity constraints to the
+    resulting pseudo-singular/eigen vectors.
 License: GPL-3
+URL: https://github.com/vguillemot/sGSVD
+BugReports: https://github.com/vguillemot/sGSVD/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
+Depends: R (>= 3.5.0)
 Imports: MASS
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    GSVD,
+    GPLS,
+    ExPosition
+VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

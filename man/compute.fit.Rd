@@ -17,10 +17,19 @@ compute.fit.eigen(ev, pseudo.ev, I, correction = "gevd")
 \item{J}{the number of variables (for MCA correction)}
 
 \item{correction}{the type of correction, e.g., "gsvd" (no correction), "mca", "mfa"}
+
+\item{ev}{a vector of eigenvalues}
+
+\item{pseudo.ev}{a vector of the pseudo eigenvalues (from sparseGEIGEN)}
+
+\item{I}{the number of variables}
 }
 \value{
 the corrected eigenvalues and tau
 }
 \description{
 Compute r1 (the explained variance) for sparsity indices
+}
+\examples{
+compute.fit(d = c(3, 2, 1), pseudo.d = c(2.5, 1.5, 0.5), J = 5)
 }

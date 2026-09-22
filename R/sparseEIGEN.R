@@ -9,16 +9,18 @@
 #' eig or eigen = initializes with the EVD,
 #' rand = initializes with a random vector.
 #' @param rds The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension;
-#' @param seed
-#' @param grp
-#' @param orthogonality
-#' @param OrthSpace
-#' @param projPriority
-#' @param itermaxALS
-#' @param itermaxPOCS
-#' @param epsALS
-#' @param epsPOCS
-#' $L_1$ ball for each left vector
+#' @param seed a random seed for result reproducibility; if NULL (the default), no random seed will be used
+#' @param grp vector describing the groups; default to one group per row
+#' @param orthogonality whether the orthogonality constraint is applied on the "loadings" (default)
+#' @param OrthSpace matrix defining the orthogonal space, Default: NULL
+#' @param projPriority the order in which the projections are applied, Default: 'orth'
+#' @param compute_sparsity_index whether the sparsity index should be computed, Default: TRUE
+#' @param correction4SI correction for the explained variance for sparsity indices, e.g., "gevd" (no correction)
+#' @param itermaxALS the maximum number of ALS iterations, Default: 1000
+#' @param itermaxPOCS the maximum number of POCS iterations, Default: 1000
+#' @param epsALS precision for ALS, Default: 1e-10
+#' @param epsPOCS precision for POCS, Default: 1e-10
+#' @param tol.si tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps
 #' @return Pseudo-eigen vectors and values
 #' @examples
 #' U <- matrix(rnorm(20), 5, 4)
@@ -26,7 +28,7 @@
 #' @author Vincent Guillemot
 #' @export
 sparseEIGEN <- function(X, k = 2L,
-                 init = NULL, seed = NULL,
+                 init = "svd", seed = NULL,
                  rds = rep(1, k),
                  grp = NULL,
                  orthogonality = "loadings",
@@ -103,6 +105,20 @@ sparseEIGEN <- function(X, k = 2L,
   return(res)
 }
 
+#' Validate the arguments of \code{\link{sparseEIGEN}} and \code{\link{sparseEIGENpos}}
+#'
+#' @param X a symmetric square (data) matrix
+#' @param k the desired rank of the decomposition
+#' @param init how to initialize the algorithm
+#' @param seed a random seed for result reproducibility
+#' @param rds the radiuses of the L1 or LG constraint
+#' @param grp vector describing the groups
+#' @param orthogonality whether the orthogonality constraint is applied on the loadings
+#' @param OrthSpace matrix defining the orthogonal space
+#' @param projPriority the order in which the projections are applied
+#'
+#' @return NULL, invisibly; called for its side effect of raising an error on invalid input
+#' @noRd
 runTestsEIGEN <- function(X, k, init, seed,
                          rds, grp,
                          orthogonality, OrthSpace,
@@ -127,12 +143,12 @@ runTestsEIGEN <- function(X, k, init, seed,
 
   ##### Test initialization ####
   if (is.null(init)) {
-    stop("init should be either svd or rand or a matrix.")
+    stop("init should be either svd, eigen, eig, rand, or a matrix.")
   }
 
   if (is.character(init)) {
-    if (!init %in% c("svd", "rand"))
-      stop("init should be either svd or rand.")
+    if (!init %in% c("svd", "eigen", "eig", "rand"))
+      stop("init should be either svd, eigen, eig, or rand.")
   }
 
   if (is.matrix(init)) {
@@ -144,6 +160,16 @@ runTestsEIGEN <- function(X, k, init, seed,
   return(NULL)
 }
 
+#' Build the initial pseudo-eigenvectors for \code{\link{sparseEIGEN}} and \code{\link{sparseEIGENpos}}
+#'
+#' @param X a symmetric square (data) matrix
+#' @param I number of rows/columns of X
+#' @param k the desired rank of the decomposition
+#' @param init how to initialize the algorithm
+#' @param seed a random seed for result reproducibility, Default: NULL
+#'
+#' @return A list with the initial vectors \code{U0}
+#' @noRd
 initializeEIGEN <- function(X, I, k, init, seed = NULL) {
 
   if (!is.null(seed)) set.seed(seed)

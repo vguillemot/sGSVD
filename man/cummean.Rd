@@ -8,10 +8,15 @@ cummean(x, na.rm = FALSE)
 }
 \arguments{
 \item{x}{a vector of numeric values}
+
+\item{na.rm}{should missing values be removed (default to FALSE)}
 }
 \value{
 the cumulative arithmetic mean
 }
 \description{
 Cumulative arithmetic mean
+}
+\examples{
+cummean(c(1, 2, 3))
 }

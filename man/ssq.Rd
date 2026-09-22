@@ -7,10 +7,10 @@
 ssq(u)
 }
 \arguments{
-\item{x}{A vector of numerics}
+\item{u}{A vector of numerics}
 }
 \value{
-The sum of the squared coefficients of vector x.
+The sum of the squared coefficients of vector u.
 }
 \description{
 Compute the sum of squares.

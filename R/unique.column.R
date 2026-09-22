@@ -5,10 +5,9 @@
 #' @return The unique columns of \eqn{x}.
 #' @examples
 #' x <- matrix(c(1,2,3, 1.001, 2.002, 3.003), nrow = 3, ncol = 2, byrow = FALSE)
-#' unique.column(x, round = 2
+#' unique_column(x, n.round = 2)
 #' @export
-unique.column <- function(x, n.round) {
-  suppressMessages(require("data.table"))
+unique_column <- function(x, n.round) {
   xt.round <- t(round(x, n.round))
   return(as.matrix(x[,!duplicated(xt.round)]))
 }

@@ -1,7 +1,7 @@
 #' Compute the sum of squares.
 #'
-#' @param x A vector of numerics
-#' @return The sum of the squared coefficients of vector x.
+#' @param u A vector of numerics
+#' @return The sum of the squared coefficients of vector u.
 #' @examples 
 #' ssq(1:10)
 #' @export

@@ -3,31 +3,31 @@
 #'
 #' @param X a (data) matrix;
 #' @param Y a second (data) matrix; this is optional and is only used for a two-table method, Default: NULL
-#' @param LW PARAM_DESCRIPTION
-#' @param RW PARAM_DESCRIPTION
+#' @param LW left constraints (weights) applied to X (and thus to the left pseudo-singular vectors)
+#' @param RW right constraints (weights) applied to X (and thus to the right pseudo-singular vectors)
 #' @param k the desired rank of the singular decomposition, Default: 0
-#' @param tol PARAM_DESCRIPTION, Default: .Machine$double.eps
+#' @param tol tolerance below which singular values are considered zero, Default: .Machine$double.eps
 #' @param init How to initialize the algorithm, Default: 'svd'
-#' @param initLeft PARAM_DESCRIPTION, Default: NULL
-#' @param initRight PARAM_DESCRIPTION, Default: NULL
-#' @param seed PARAM_DESCRIPTION, Default: NULL
+#' @param initLeft how the left pseudo-singular vectors are initialized, Default: NULL
+#' @param initRight how the right pseudo-singular vectors are initialized, Default: NULL
+#' @param seed a random seed for result reproducibility; if NULL (the default), no random seed will be used, Default: NULL
 #' @param rdsLeft The radius (>0) of the
 #' $L_1$ ball for each left vector, Default: rep(1, k)
 #' @param rdsRight The radius (>0) of the $L_1$ balls for each right vector, Default: rep(1, k)
-#' @param grpLeft PARAM_DESCRIPTION, Default: NULL
-#' @param grpRight PARAM_DESCRIPTION, Default: NULL
-#' @param orthogonality PARAM_DESCRIPTION, Default: 'loadings'
-#' @param OrthSpaceLeft PARAM_DESCRIPTION, Default: NULL
-#' @param OrthSpaceRight PARAM_DESCRIPTION, Default: NULL
-#' @param projPriority PARAM_DESCRIPTION, Default: 'orth'
-#' @param projPriorityLeft PARAM_DESCRIPTION, Default: projPriority
-#' @param projPriorityRight PARAM_DESCRIPTION, Default: projPriority
+#' @param grpLeft vector describing the groups for the left vectors, Default: NULL
+#' @param grpRight vector describing the groups for the right vectors, Default: NULL
+#' @param orthogonality whether the orthogonality constraint is applied on the "loadings" (default), the "scores", or "both"
+#' @param OrthSpaceLeft matrix defining the orthogonal space for the left vectors, Default: NULL
+#' @param OrthSpaceRight matrix defining the orthogonal space for the right vectors, Default: NULL
+#' @param projPriority the order in which the projections are applied, Default: 'orth'
+#' @param projPriorityLeft the order in which the projections are applied for the left vectors, Default: projPriority
+#' @param projPriorityRight the order in which the projections are applied for the right vectors, Default: projPriority
 #' @param correction4SI Correction for the explained variance for sparsity indices, e.g., "gsvd" (no correction), "mca" (Benzecri correction of MCA), or "mfa"
 #' @param itermaxALS The maximum number of ALS iterations, Default: 1000
 #' @param itermaxPOCS The maximum number of the POCs iterations, Default: 1000
 #' @param epsALS Precision in ALS, Default: 1e-10
-#' @param LM
-#' @param RM
+#' @param LM left masses, used to compute the singular vectors' contributions
+#' @param RM right masses, used to compute the singular vectors' contributions
 #' @param epsPOCS Precision in POCs, Default: 1e-10
 #' @param tol.si Tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps
 #'

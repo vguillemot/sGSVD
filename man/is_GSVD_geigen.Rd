@@ -16,7 +16,7 @@ boolean. \code{TRUE} if the object is of class geigen, FALSE otherwise.
 Tests if the \code{x} object is of class type "geigen"
 }
 \details{
-Only \code{\link{geigen}} produces this class type.
+Only \code{geigen} (from the \code{GSVD} package) produces this class type.
 }
 \seealso{
 \code{\link{inherits}}

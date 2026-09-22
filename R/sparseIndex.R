@@ -4,6 +4,8 @@
 #' @param singularValues The singular values of the original data matrix (used to compute the fit of the sparse analysis)
 #' @param correction The type of correction for proportion of explained variance (r1), e.g., "gsvd" (no correction), "mca", "mfa"
 #' @param tol a tolerance parameter indicating when a small value should be considered equal to 0
+#' @param res.sgevd The result of a sparse Generalized EigenValue Decomposition of a data-matrix, usually obtained with sGSVD::sparseGEIGEN
+#' @param eigenValues The eigenvalues of the original data matrix (used to compute the fit of the sparse analysis)
 #'
 #' @return various sparsity indices and their components.
 #' @export
@@ -24,12 +26,12 @@ sparseIndex <- function(res.sgsvd, singularValues, correction = "gsvd", tol = 1e
   if (is.null(res.sgsvd$grpLeft)) {
     ctrLeft <- U.sq
   } else {
-    ctrLeft <- apply(U.sq, 2, function(x) tapply(x, res.sgsvd$grpLeft, FUN = sum))
+    ctrLeft <- rowsum(U.sq, res.sgsvd$grpLeft)
   }
   if (is.null(res.sgsvd$grpRight)) {
     ctrRight <- V.sq
   } else {
-    ctrRight <- apply(V.sq, 2, function(x) tapply(x, res.sgsvd$grpRight, FUN = sum))
+    ctrRight <- rowsum(V.sq, res.sgsvd$grpRight)
   }
   I <- NROW(ctrLeft)
   J <- NROW(ctrRight)
@@ -125,12 +127,15 @@ gmean <- function(x, na.rm = TRUE) {
 #' @param pseudo.d a vector of the pseudo singular values (from sparseGSVD)
 #' @param J the number of variables (for MCA correction)
 #' @param correction the type of correction, e.g., "gsvd" (no correction), "mca", "mfa"
+#' @param ev a vector of eigenvalues
+#' @param pseudo.ev a vector of the pseudo eigenvalues (from sparseGEIGEN)
+#' @param I the number of variables
 #'
 #' @return the corrected eigenvalues and tau
 #' @export
 #'
 #' @examples
-#'
+#' compute.fit(d = c(3, 2, 1), pseudo.d = c(2.5, 1.5, 0.5), J = 5)
 compute.fit <- function(d, pseudo.d, J, correction = "gsvd") {
   if (correction == "mca") {
     lambda <- (J / (J - 1) * (d ^ 2 - (1 / J))) ^ 2
@@ -162,11 +167,13 @@ compute.fit.eigen <- function(ev, pseudo.ev, I, correction = "gevd") {
 #' Cumulative arithmetic mean
 #'
 #' @param x a vector of numeric values
+#' @param na.rm should missing values be removed (default to FALSE)
 #'
 #' @return the cumulative arithmetic mean
 #' @export
 #'
 #' @examples
+#' cummean(c(1, 2, 3))
 cummean <- function(x, na.rm = FALSE) {
   if (na.rm) x <- na.omit(x)
   return(cumsum(x) / seq_along(x))

@@ -8,7 +8,7 @@ sparseGEIGEN(
   X,
   W,
   k = 2L,
-  init = NULL,
+  init = "svd",
   seed = NULL,
   rds = rep(1, k),
   grp = NULL,
@@ -29,6 +29,32 @@ sparseGEIGEN(
 \item{W}{\bold{W}eights -- the constraints applied to the matrix and thus the eigen vectors.}
 
 \item{k}{total number of components to return though the full variance will still be returned (see \code{d_full}). If 0, the full set of components are returned.}
+
+\item{init}{How to initialize the algorithm, Default: 'svd'}
+
+\item{seed}{a random seed for result reproducibility; if NULL (the default), no random seed will be used}
+
+\item{rds}{The radiuses (radii?) (>0) of the L1 or LG constraint; one for each dimension}
+
+\item{grp}{vector describing the groups; default to one group per row}
+
+\item{orthogonality}{whether the orthogonality constraint is applied on the "loadings" (default)}
+
+\item{OrthSpace}{matrix defining the orthogonal space, Default: NULL}
+
+\item{projPriority}{the order in which the projections are applied, Default: 'orth'}
+
+\item{correction4SI}{correction for the explained variance for sparsity indices, e.g., "gevd" (no correction)}
+
+\item{itermaxALS}{the maximum number of ALS iterations, Default: 1000}
+
+\item{itermaxPOCS}{the maximum number of POCS iterations, Default: 1000}
+
+\item{epsALS}{precision for ALS, Default: 1e-10}
+
+\item{epsPOCS}{precision for POCS, Default: 1e-10}
+
+\item{tol.si}{tolerance for the computation of the Sparse Index, set by default to .Machine$double.eps}
 }
 \value{
 A list with eight elements:
@@ -46,24 +72,24 @@ A list with eight elements:
 \examples{
 
 ## (Metric) Multidimensional Scaling
-data(wine, package="GSVD")
+data(wine)
 D <- as.matrix(dist(wine$objective))
 masses <- rep(1/nrow(D), nrow(D))
 Xi <- diag(nrow(D)) - ( rep(1,nrow(D)) \%o\% masses )
 S <- Xi \%*\% (-(D^2) / 2) \%*\% t(Xi)
-mds.res_sparse_geigen <- sparse_geigen(S)
+mds.res_sparse_geigen <- sparseGEIGEN(S)
 
 ## Principal components analysis: "covariance"
 cov_X <- as.matrix(cov(wine$objective))
-cov_pca.res_sparse_geigen <- sparse_geigen(cov_X)
+cov_pca.res_sparse_geigen <- sparseGEIGEN(cov_X)
 
 ## Principal components analysis: "correlation"
 cor_X <- as.matrix(cor(wine$objective))
-cor_pca.res_sparse_geigen <- sparse_geigen(cor_X)
+cor_pca.res_sparse_geigen <- sparseGEIGEN(cor_X)
 
 }
 \seealso{
-\code{\link{tolerance_eigen}}, \code{\link{gsvd}} and \code{\link{gplssvd}}
+\code{tolerance_eigen} and \code{gsvd} (from the \code{GSVD} package), and \code{\link{gplssvd}}
 }
 \author{
 Derek Beaton
